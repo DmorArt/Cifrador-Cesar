@@ -120,11 +120,11 @@
                 </div>
                 <div>
                     <h1 class="text-2xl font-black uppercase tracking-[0.4em] text-white">Cifrador César</h1>
-                    <p class="text-[10px] text-neutral-500 font-mono tracking-widest uppercase italic">Daniel Morisio // High Performance Crypto Instrument</p>
+                    <p class="text-[12px] text-neutral-400 font-mono tracking-widest uppercase italic transition-colors">Daniel Morisio // High Performance Crypto Instrument</p>
                 </div>
             </div>
 
-            <!-- SELECTOR DESPLEGABLE REFINADO -->
+            <!-- SELECTOR DESPLEGABLE -->
             <div class="relative">
                 <button id="theme-menu-btn" class="flex items-center gap-3 bg-neutral-900/40 p-3 px-5 rounded-2xl border border-neutral-800/50 hover:bg-neutral-800/60 transition-all active:scale-95 group">
                     <div class="w-3 h-3 rounded-full theme-bg shadow-[0_0_10px_var(--theme-color)]"></div>
@@ -161,7 +161,7 @@
                     <div class="relative">
                         <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 theme-glow-bg rounded-full blur-[100px] animate-pulse"></div>
                         <div class="relative flex flex-col items-center">
-                            <span class="text-[11px] font-black uppercase tracking-[0.5em] text-neutral-600 mb-4">Desplazamiento</span>
+                            <span class="text-[13px] font-black uppercase tracking-[0.5em] text-neutral-400 mb-4 transition-colors">Desplazamiento</span>
                             <div id="shift-value" class="text-7xl md:text-9xl font-black theme-accent tabular-nums glow-text transition-colors duration-500 leading-none select-none tracking-tighter">03</div>
                             <div class="w-24 h-1 theme-bg opacity-30 rounded-full mt-8 mb-8"></div>
                             
@@ -176,26 +176,26 @@
 
             <div class="lg:col-span-4 flex flex-col gap-6">
                 <div class="bg-neutral-900/40 p-8 lg:p-10 rounded-[4rem] border border-neutral-800/40 backdrop-blur-xl shadow-2xl h-full flex flex-col justify-between">
-                    <div class="space-y-8 flex-1">
-                        <div class="space-y-3">
-                            <label class="text-[11px] font-black uppercase tracking-[0.4em] text-neutral-500 ml-2">Entrada de Texto</label>
-                            <textarea id="input-text" placeholder="Escribe aquí tu mensaje confidencial..." class="w-full h-48 bg-black/40 border border-neutral-800/60 rounded-[2.5rem] p-8 text-lg focus:theme-border-active transition-all outline-none resize-none placeholder:text-neutral-800 text-neutral-300 shadow-inner font-sans"></textarea>
+                    <div class="space-y-6 flex-1">
+                        <div class="space-y-2">
+                            <label class="text-[13px] font-black uppercase tracking-[0.4em] text-neutral-400 ml-2 transition-colors">Entrada de Texto</label>
+                            <textarea id="input-text" placeholder="Escribe aquí tu mensaje confidencial..." class="w-full h-36 bg-black/40 border border-neutral-800/60 rounded-[2.5rem] p-8 text-lg focus:theme-border-active transition-all outline-none resize-none placeholder:text-neutral-800 text-neutral-300 shadow-inner font-sans"></textarea>
                         </div>
 
-                        <div class="space-y-4">
+                        <div class="space-y-3">
                             <div class="flex justify-between items-center px-2">
-                                <label class="text-[11px] font-black uppercase tracking-[0.4em] text-neutral-500">Resultado Cifrado</label>
+                                <label class="text-[13px] font-black uppercase tracking-[0.4em] text-neutral-400 transition-colors">Resultado Cifrado</label>
                                 <button id="copy-btn" class="px-6 py-2.5 theme-glow-bg hover:bg-white/5 rounded-2xl transition-all theme-accent text-[11px] font-bold uppercase tracking-widest theme-border active:scale-95 shadow-lg">
                                     Copiar
                                 </button>
                             </div>
-                            <div id="output-text" class="w-full min-h-[260px] theme-glow-bg border theme-border rounded-[2.5rem] p-8 font-mono text-2xl theme-accent break-all leading-relaxed shadow-inner transition-colors duration-500">
+                            <div id="output-text" class="w-full min-h-[220px] theme-glow-bg border theme-border rounded-[2.5rem] p-8 font-mono text-2xl theme-accent break-all leading-relaxed shadow-inner transition-colors duration-500">
                                 <span class="text-neutral-800 italic text-sm font-sans">El texto aparecerá aquí...</span>
                             </div>
                         </div>
                     </div>
 
-                    <button id="reset-btn" class="w-full mt-10 py-6 flex items-center justify-center gap-3 bg-neutral-800/40 hover:bg-red-950/20 hover:text-red-500 border border-neutral-800/40 text-neutral-500 rounded-[2.5rem] font-bold transition-all text-[11px] tracking-[0.4em] uppercase active:scale-95">
+                    <button id="reset-btn" class="w-full mt-8 py-6 flex items-center justify-center gap-3 bg-neutral-800/40 hover:bg-red-950/20 hover:text-red-500 border border-neutral-800/40 text-neutral-500 rounded-[2.5rem] font-bold transition-all text-[11px] tracking-[0.4em] uppercase active:scale-95">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
                         Reiniciar Todo el Sistema
                     </button>
@@ -203,8 +203,8 @@
             </div>
         </main>
 
-        <footer class="py-6 text-center w-full opacity-40">
-            <p class="text-neutral-500 text-[10px] font-bold uppercase tracking-[0.5em]">
+        <footer class="py-8 text-center w-full opacity-80 border-t border-neutral-900 mt-4">
+            <p class="text-neutral-400 text-[10px] font-bold uppercase tracking-[0.5em] transition-colors">
                 © Daniel Morisio // Visual Logic Research Lab // 2026
             </p>
         </footer>
@@ -216,6 +216,7 @@
         
         let state = {
             shift: 3,
+            lastShift: 3,
             rotation: 3 * (360 / total),
             message: '',
             isDragging: false,
@@ -223,6 +224,25 @@
             themeColor: '#fbbf24',
             themeRGB: '251, 191, 36'
         };
+
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        let audioCtx = null;
+
+        function playTick() {
+            if (!audioCtx) audioCtx = new AudioContext();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(580, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.1);
+            gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.1);
+        }
 
         const canvas = document.getElementById('mainDisk');
         const ctx = canvas.getContext('2d');
@@ -238,7 +258,6 @@
         const themeDropdown = document.getElementById('theme-dropdown');
         const paletteBtns = document.querySelectorAll('.palette-btn');
 
-        // Lógica del Desplegable
         themeMenuBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             themeDropdown.classList.toggle('hidden');
@@ -274,10 +293,7 @@
             const centerY = canvas.height / 2;
             const radius = Math.min(centerX, centerY) * 0.94;
             const angleStep = (Math.PI * 2) / total;
-
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            // 1. Disco Exterior (Fijo)
             ctx.beginPath();
             ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
             let gradOuter = ctx.createRadialGradient(centerX, centerY, radius * 0.8, centerX, centerY, radius);
@@ -288,14 +304,11 @@
             ctx.strokeStyle = '#222';
             ctx.lineWidth = 4;
             ctx.stroke();
-
-            // 1.1 Letras exteriores fijas
             const outerTextRadius = radius * 0.88;
-            ctx.font = `bold ${radius * 0.12}px Inter`;
-            ctx.fillStyle = '#666';
+            ctx.font = `bold ${radius * 0.135}px Inter`;
+            ctx.fillStyle = '#9aa'; 
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-
             ALPHABET.forEach((letter, i) => {
                 const angle = i * angleStep - Math.PI / 2;
                 const tx = centerX + Math.cos(angle) * outerTextRadius;
@@ -306,8 +319,6 @@
                 ctx.fillText(letter, 0, 0);
                 ctx.restore();
             });
-
-            // 1.2 FLECHA FIJA EXTERIOR
             ctx.save();
             ctx.translate(centerX, centerY - radius - 15);
             ctx.beginPath();
@@ -320,8 +331,6 @@
             ctx.shadowBlur = 20;
             ctx.fill();
             ctx.restore();
-
-            // 1.3 Visor Blanco
             const markerR = radius * 0.76;
             const markerAngle = -Math.PI / 2; 
             ctx.save();
@@ -334,14 +343,10 @@
             ctx.shadowBlur = 10;
             ctx.stroke();
             ctx.restore();
-
-            // 2. Grupo Giratorio
             ctx.save();
             ctx.translate(centerX, centerY);
             ctx.rotate(state.rotation * Math.PI / 180);
             ctx.translate(-centerX, -centerY);
-
-            // 2.1 Números Tema
             ctx.font = `bold ${radius * 0.054}px "JetBrains Mono"`;
             ctx.fillStyle = `rgba(${state.themeRGB}, 0.95)`;
             ALPHABET.forEach((_, i) => {
@@ -354,8 +359,6 @@
                 ctx.fillText(i, 0, 0);
                 ctx.restore();
             });
-
-            // 2.2 Disco interno
             const innerR = radius * 0.68;
             ctx.shadowColor = 'rgba(0,0,0,0.8)';
             ctx.shadowBlur = 50;
@@ -367,16 +370,12 @@
             gradInner.addColorStop(1, '#111');
             ctx.fillStyle = gradInner;
             ctx.fill();
-            
             ctx.shadowColor = 'transparent';
             ctx.strokeStyle = state.themeColor;
             ctx.lineWidth = 6;
             ctx.stroke();
-
-            // 2.3 Letras interiores Tema
             ctx.font = `700 ${radius * 0.12}px Inter`;
             ctx.fillStyle = state.themeColor;
-            
             ALPHABET.forEach((letter, i) => {
                 const angle = i * angleStep - Math.PI / 2;
                 const tx = centerX + Math.cos(angle) * (innerR * 0.81);
@@ -387,10 +386,7 @@
                 ctx.fillText(letter, 0, 0);
                 ctx.restore();
             });
-
             ctx.restore();
-
-            // 1.4 FLECHA FIJA INTERIOR
             ctx.save();
             ctx.translate(centerX, centerY - (innerR * 0.65)); 
             ctx.beginPath();
@@ -403,8 +399,6 @@
             ctx.shadowBlur = 12;
             ctx.fill();
             ctx.restore();
-
-            // 3. EJE CENTRAL
             const hubRadius = 45;
             ctx.beginPath();
             ctx.arc(centerX, centerY, hubRadius, 0, Math.PI * 2);
@@ -416,13 +410,11 @@
             ctx.strokeStyle = '#333';
             ctx.lineWidth = 2;
             ctx.stroke();
-
             ctx.beginPath();
             ctx.arc(centerX, centerY, hubRadius * 0.7, 0, Math.PI * 2);
             ctx.strokeStyle = `rgba(${state.themeRGB}, 0.15)`;
             ctx.lineWidth = 1;
             ctx.stroke();
-
             ctx.beginPath();
             ctx.strokeStyle = `rgba(${state.themeRGB}, 0.3)`;
             ctx.lineWidth = 1.5;
@@ -431,7 +423,6 @@
             ctx.moveTo(centerX - hubRadius * 0.5, centerY);
             ctx.lineTo(centerX + hubRadius * 0.5, centerY);
             ctx.stroke();
-
             const dotRadius = hubRadius * 0.4;
             [0, Math.PI/2, Math.PI, Math.PI*1.5].forEach(a => {
                 ctx.beginPath();
@@ -439,7 +430,6 @@
                 ctx.fillStyle = '#444';
                 ctx.fill();
             });
-
             ctx.beginPath();
             ctx.arc(centerX, centerY, hubRadius * 0.15, 0, Math.PI * 2);
             ctx.fillStyle = state.themeColor;
@@ -447,7 +437,6 @@
             ctx.shadowBlur = 10;
             ctx.fill();
             ctx.shadowBlur = 0;
-            
             ctx.beginPath();
             ctx.arc(centerX, centerY, hubRadius * 0.08, 0, Math.PI * 2);
             ctx.fillStyle = '#fff';
@@ -475,7 +464,10 @@
             const res = encrypt(state.message, state.shift);
             outputEl.innerHTML = res ? res : '<span class="text-neutral-800 italic text-sm font-sans">El texto aparecerá aquí...</span>';
             shiftDisplay.textContent = state.shift.toString().padStart(2, '0');
-            
+            if (state.shift !== state.lastShift) {
+                playTick();
+                state.lastShift = state.shift;
+            }
             if (state.isDragging) {
                 diskGlow.style.boxShadow = `0 0 50px 15px rgba(${state.themeRGB}, 0.35), inset 0 0 15px rgba(${state.themeRGB}, 0.2)`;
                 ambientGlow.style.backgroundColor = `rgba(${state.themeRGB}, 0.015)`;
@@ -483,7 +475,6 @@
                 diskGlow.style.boxShadow = 'none';
                 ambientGlow.style.backgroundColor = 'transparent';
             }
-            
             draw();
         }
 
@@ -541,6 +532,7 @@
             state.shift = 0;
             state.rotation = 0;
             update();
+            playTick();
         });
 
         resetBtn.addEventListener('click', () => {
@@ -554,7 +546,12 @@
         copyBtn.addEventListener('click', () => {
             const text = outputEl.innerText;
             if (text && !text.includes("El texto aparecerá aquí")) {
-                navigator.clipboard.writeText(text);
+                const tempTextArea = document.createElement("textarea");
+                tempTextArea.value = text;
+                document.body.appendChild(tempTextArea);
+                tempTextArea.select();
+                document.execCommand("copy");
+                document.body.removeChild(tempTextArea);
                 const originalText = copyBtn.innerText;
                 copyBtn.innerText = "¡OK!";
                 setTimeout(() => copyBtn.innerText = originalText, 1000);
