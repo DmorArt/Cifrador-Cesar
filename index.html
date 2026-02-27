@@ -20,7 +20,8 @@
             color: #e5e5e5;
             font-family: 'Inter', sans-serif;
             overflow-x: hidden;
-            /* touch-action: none; -> Eliminado para permitir el scroll en móviles */
+            /* Scroll habilitado para el body */
+            -webkit-overflow-scrolling: touch;
         }
 
         .font-mono {
@@ -95,19 +96,19 @@
 
     <div class="min-h-screen p-4 lg:p-6 flex flex-col items-center justify-start lg:justify-center">
         
-        <header class="w-full max-w-[1850px] flex justify-between items-center mb-10 lg:mb-6 px-4">
-            <div class="flex items-center gap-5">
+        <header class="w-full max-w-[1850px] flex flex-col sm:flex-row justify-between items-center mb-8 lg:mb-6 gap-6 px-4">
+            <div class="flex items-center gap-5 w-full sm:w-auto">
                 <div class="theme-bg p-3 rounded-2xl shadow-xl shadow-black/50 transition-colors duration-500">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                 </div>
                 <div>
-                    <h1 class="text-2xl font-black uppercase tracking-[0.4em] text-white">Cifrador César</h1>
-                    <p class="text-[12px] text-neutral-400 font-mono tracking-widest uppercase italic transition-colors">Daniel Morisio // High Performance Crypto Instrument</p>
+                    <h1 class="text-xl sm:text-2xl font-black uppercase tracking-[0.4em] text-white">Cifrador César</h1>
+                    <p class="text-[10px] sm:text-[12px] text-neutral-400 font-mono tracking-widest uppercase italic transition-colors">Daniel Morisio // High Performance Crypto Instrument</p>
                 </div>
             </div>
 
-            <div class="relative">
-                <button id="theme-menu-btn" class="flex items-center gap-4 bg-neutral-900/40 p-4 px-8 rounded-2xl border border-neutral-800/50 hover:bg-neutral-800/60 transition-all active:scale-95 group">
+            <div class="relative w-full sm:w-auto flex justify-end">
+                <button id="theme-menu-btn" class="flex items-center gap-4 bg-neutral-900/40 p-4 px-8 rounded-2xl border border-neutral-800/50 hover:bg-neutral-800/60 transition-all active:scale-95 group w-full sm:w-auto justify-center">
                     <div class="w-4 h-4 rounded-full theme-bg shadow-[0_0_12px_var(--theme-color)]"></div>
                     <span class="text-[11px] font-black uppercase tracking-widest text-neutral-400 group-hover:text-neutral-200">Settings</span>
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-neutral-600 group-hover:text-neutral-400"><path d="m6 9 6 6 6-6"/></svg>
@@ -148,24 +149,25 @@
 
         <main class="w-full max-w-[1850px] grid grid-cols-1 lg:grid-cols-12 gap-8 lg:flex-1 items-stretch">
             
-            <div class="lg:col-span-8 flex flex-col md:flex-row items-center justify-center bg-gradient-to-br from-neutral-900/40 to-black p-6 lg:p-12 rounded-[4rem] border border-neutral-800/30 shadow-2xl relative overflow-hidden group">
+            <!-- CONTENEDOR DEL DISCO PROTAGONISTA -->
+            <div class="lg:col-span-8 flex flex-col md:flex-row items-center justify-center bg-gradient-to-br from-neutral-900/40 to-black p-4 lg:p-12 rounded-[3rem] lg:rounded-[4rem] border border-neutral-800/30 shadow-2xl relative overflow-hidden group">
                 <div id="ambient-glow" class="absolute inset-0 transition-all duration-700 pointer-events-none"></div>
                 <div class="absolute top-0 right-0 w-64 h-64 theme-glow-bg rounded-full blur-[120px] pointer-events-none opacity-20"></div>
                 
-                <div id="disk-wrapper" class="relative w-full max-w-[340px] sm:max-w-[600px] lg:max-w-[900px] aspect-square flex items-center justify-center mx-auto transition-all duration-300">
+                <div id="disk-wrapper" class="relative w-full max-w-[95vw] sm:max-w-[600px] lg:max-w-[900px] aspect-square flex items-center justify-center mx-auto transition-all duration-300">
                     <div id="disk-glow" class="absolute w-[94%] h-[94%] rounded-full transition-all duration-500 pointer-events-none z-0"></div>
                     <canvas id="mainDisk" width="1600" height="1600" class="w-full h-full relative z-10 cursor-grab active:cursor-grabbing"></canvas>
                 </div>
 
-                <div class="flex flex-col items-center justify-center md:border-l border-neutral-800/20 md:pl-12 mt-10 md:mt-0 min-w-[240px]">
-                    <div class="relative">
+                <div class="flex flex-col items-center justify-center md:border-l border-neutral-800/20 md:pl-12 mt-8 md:mt-0 min-w-[240px] w-full md:w-auto">
+                    <div class="relative flex flex-col items-center">
                         <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-amber-500/10 rounded-full blur-[100px] animate-pulse"></div>
                         <div class="relative flex flex-col items-center">
-                            <span class="text-[13px] font-black uppercase tracking-[0.5em] text-neutral-400 mb-4 transition-colors">Desplazamiento</span>
-                            <div id="shift-value" class="text-7xl md:text-9xl font-black theme-accent tabular-nums glow-text transition-colors duration-500 leading-none select-none tracking-tighter">03</div>
-                            <div class="w-24 h-1 theme-bg opacity-30 rounded-full mt-8 mb-8"></div>
+                            <span class="text-[12px] sm:text-[13px] font-black uppercase tracking-[0.5em] text-neutral-400 mb-2 transition-colors">Desplazamiento</span>
+                            <div id="shift-value" class="text-6xl sm:text-7xl md:text-9xl font-black theme-accent tabular-nums glow-text transition-colors duration-500 leading-none select-none tracking-tighter">03</div>
+                            <div class="w-20 h-1 theme-bg opacity-30 rounded-full mt-4 mb-4 lg:mt-8 lg:mb-8"></div>
                             
-                            <button id="disk-reset-btn" class="disk-action-btn flex items-center gap-3 px-6 py-3 bg-neutral-900/80 text-neutral-500 rounded-2xl border border-neutral-800 transition-all active:scale-95 group/btn" title="Reiniciar Disco">
+                            <button id="disk-reset-btn" class="flex items-center gap-3 px-6 py-3 bg-neutral-900/80 text-neutral-500 rounded-2xl border border-neutral-800 transition-all active:scale-95 hover:text-white group/btn">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="transition-transform duration-500"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
                                 <span class="text-[10px] font-bold uppercase tracking-[0.2em]">Reset Disco</span>
                             </button>
@@ -175,11 +177,11 @@
             </div>
 
             <div class="lg:col-span-4 flex flex-col gap-6">
-                <div class="bg-neutral-900/40 p-8 rounded-[3.5rem] lg:rounded-[4rem] border border-neutral-800/40 backdrop-blur-xl shadow-2xl h-full flex flex-col justify-between">
+                <div class="bg-neutral-900/40 p-8 rounded-[3rem] lg:rounded-[4rem] border border-neutral-800/40 backdrop-blur-xl shadow-2xl h-full flex flex-col justify-between">
                     <div class="space-y-8 flex-1">
                         <div class="space-y-2">
                             <label class="text-[13px] font-black uppercase tracking-[0.4em] text-neutral-400 ml-2 transition-colors">Entrada de Texto</label>
-                            <textarea id="input-text" placeholder="Escribe aquí tu mensaje confidencial..." class="w-full h-36 bg-black/40 border border-neutral-800/60 rounded-[2.5rem] p-8 text-lg focus:theme-border-active transition-all outline-none resize-none placeholder:text-neutral-800 text-neutral-300 shadow-inner font-sans"></textarea>
+                            <textarea id="input-text" placeholder="Escribe aquí tu mensaje confidencial..." class="w-full h-32 bg-black/40 border border-neutral-800/60 rounded-[2.5rem] p-8 text-lg focus:theme-border-active transition-all outline-none resize-none placeholder:text-neutral-800 text-neutral-300 shadow-inner font-sans"></textarea>
                         </div>
 
                         <div class="space-y-4">
@@ -189,7 +191,7 @@
                                     Copiar
                                 </button>
                             </div>
-                            <div id="output-text" class="w-full min-h-[160px] theme-glow-bg border theme-border rounded-[2.5rem] p-8 font-mono text-2xl theme-accent break-all leading-relaxed shadow-inner transition-colors duration-500">
+                            <div id="output-text" class="w-full min-h-[140px] theme-glow-bg border theme-border rounded-[2.5rem] p-8 font-mono text-2xl theme-accent break-all leading-relaxed shadow-inner transition-colors duration-500">
                                 <span class="text-neutral-800 italic text-sm font-sans">El texto aparecerá aquí...</span>
                             </div>
                         </div>
