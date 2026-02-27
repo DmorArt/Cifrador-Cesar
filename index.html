@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cifrador de Discos César - Daniel Morisio</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Librería para generación de PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap');
         
@@ -119,7 +121,15 @@
 
                     <div class="h-px bg-neutral-800/60 mb-5"></div>
 
-                    <div class="text-[8px] font-black uppercase tracking-widest text-neutral-600 mb-3 px-1">Configuración de Sistema</div>
+                    <div class="text-[8px] font-black uppercase tracking-widest text-neutral-600 mb-3 px-1">Herramientas</div>
+                    
+                    <button id="download-printable-btn" class="w-full mb-3 flex items-center justify-between bg-black/40 p-3 rounded-xl border border-neutral-800/50 hover:bg-neutral-800/40 transition-all group/tool">
+                        <div class="flex items-center gap-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-neutral-500 group-hover/tool:text-white"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                            <span class="text-[9px] font-bold uppercase tracking-widest text-neutral-400 group-hover/tool:text-neutral-200">Descargar Plantilla (PDF)</span>
+                        </div>
+                    </button>
+
                     <button id="audio-toggle-btn" class="w-full flex items-center justify-between bg-black/40 p-3 rounded-xl border border-neutral-800/50 hover:bg-neutral-800/40 transition-all group/toggle">
                         <div class="flex items-center gap-3">
                             <div id="audio-status-dot" class="w-2 h-2 rounded-full theme-bg shadow-[0_0_8px_var(--theme-color)]"></div>
@@ -263,6 +273,7 @@
         const audioToggleBtn = document.getElementById('audio-toggle-btn');
         const audioStatusDot = document.getElementById('audio-status-dot');
         const audioStatusLabel = document.getElementById('audio-status-label');
+        const downloadBtn = document.getElementById('download-printable-btn');
 
         themeMenuBtn.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -292,6 +303,11 @@
             }
         });
 
+        downloadBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            generatePrintablePDF();
+        });
+
         function setTheme(color, rgb) {
             state.themeColor = color;
             state.themeRGB = rgb;
@@ -319,7 +335,7 @@
             
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // 1. Disco Exterior (Revertido a estética plana V90)
+            // 1. Disco Exterior
             ctx.beginPath();
             ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
             let gradOuter = ctx.createRadialGradient(centerX, centerY, radius * 0.8, centerX, centerY, radius);
@@ -353,7 +369,7 @@
 
             const outerTextRadius = radius * 0.88;
             ctx.font = `bold ${radius * 0.135}px Inter`;
-            ctx.fillStyle = '#9aa'; // Gris técnico coordinado
+            ctx.fillStyle = '#9aa'; 
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ALPHABET.forEach((letter, i) => {
@@ -367,7 +383,6 @@
                 ctx.restore();
             });
 
-            // Marcador triangular superior (V90)
             ctx.save();
             ctx.translate(centerX, centerY - radius - 15);
             ctx.beginPath();
@@ -434,7 +449,7 @@
             }
             ctx.restore();
 
-            // FLECHAS INDICADORAS DE GIRO (Gris traslúcido grueso)
+            // FLECHAS INDICADORAS DE GIRO
             ctx.save();
             ctx.strokeStyle = 'rgba(160, 160, 160, 0.2)'; 
             ctx.lineWidth = 14.0; 
@@ -445,29 +460,23 @@
             const drawIndicator = (centerAngle) => {
                 const start = centerAngle - arrowSpan/2;
                 const end = centerAngle + arrowSpan/2;
-                
                 ctx.beginPath();
                 ctx.arc(centerX, centerY, arrowRadius, start, end);
                 ctx.stroke();
-
                 const pSize = 22;
-                // Punta 1
                 ctx.beginPath();
                 ctx.moveTo(centerX + Math.cos(end - 0.1) * (arrowRadius - pSize), centerY + Math.sin(end - 0.1) * (arrowRadius - pSize));
                 ctx.lineTo(centerX + Math.cos(end) * arrowRadius, centerY + Math.sin(end) * arrowRadius);
                 ctx.lineTo(centerX + Math.cos(end - 0.1) * (arrowRadius + pSize), centerY + Math.sin(end - 0.1) * (arrowRadius + pSize));
                 ctx.stroke();
-
-                // Punta 2
                 ctx.beginPath();
                 ctx.moveTo(centerX + Math.cos(start + 0.1) * (arrowRadius - pSize), centerY + Math.sin(start + 0.1) * (arrowRadius - pSize));
                 ctx.lineTo(centerX + Math.cos(start) * arrowRadius, centerY + Math.sin(start) * arrowRadius);
                 ctx.lineTo(centerX + Math.cos(start + 0.1) * (arrowRadius + pSize), centerY + Math.sin(start + 0.1) * (arrowRadius + pSize));
                 ctx.stroke();
             };
-
-            drawIndicator(0);       // Derecha
-            drawIndicator(Math.PI);  // Izquierda
+            drawIndicator(0);
+            drawIndicator(Math.PI);
             ctx.restore();
 
             // Índices Numéricos
@@ -525,7 +534,6 @@
             ctx.lineWidth = 3;
             ctx.stroke();
 
-            // PUNTO GRIS DE LA PERILLA
             const ledRadius = 10;
             const ledDistance = knobRadius * 0.78;
             const ledAngle = -Math.PI / 2;
@@ -544,7 +552,7 @@
             ctx.arc(lx, ly, ledRadius, 0, Math.PI * 2);
             let ledLight = ctx.createRadialGradient(lx - 2, ly - 2, 0, lx, ly, ledRadius);
             ledLight.addColorStop(0, '#fff');
-            ledLight.addColorStop(0.3, '#888'); // Gris neutro técnico
+            ledLight.addColorStop(0.3, '#888'); 
             ledLight.addColorStop(1, '#000');
             ctx.fillStyle = ledLight;
             ctx.shadowColor = 'rgba(160, 160, 160, 0.4)'; 
@@ -554,7 +562,6 @@
 
             ctx.restore(); 
 
-            // FLECHA INDICADORA CENTRAL GRIS (Sincronizada con aro exterior)
             ctx.save();
             ctx.translate(centerX, centerY - (innerR * 0.65)); 
             ctx.beginPath();
@@ -567,6 +574,151 @@
             ctx.shadowBlur = 12;
             ctx.fill();
             ctx.restore();
+        }
+
+        // GENERACIÓN DE PLANTILLA PDF MEJORADA (V98 - SIN FLECHA EXTERNA)
+        function generatePrintablePDF() {
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = 2480; 
+            tempCanvas.height = 3508;
+            const pCtx = tempCanvas.getContext('2d');
+            
+            pCtx.fillStyle = '#FFFFFF';
+            pCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+            
+            // MARCO TÉCNICO Y MARCAS DE CORTE
+            pCtx.strokeStyle = '#000000';
+            pCtx.lineWidth = 2;
+            pCtx.strokeRect(80, 80, 2320, 3348);
+            
+            // TÍTULO
+            pCtx.fillStyle = '#000000';
+            pCtx.font = 'bold 50px Inter';
+            pCtx.textAlign = 'center';
+            pCtx.fillText('PLANTILLA RECORTABLE: CIFRADOR CÉSAR', tempCanvas.width / 2, 160);
+            pCtx.font = '30px Inter';
+            pCtx.fillText('LABORATORIO DE CRIPTOGRAFÍA VISUAL // DANIEL MORISIO', tempCanvas.width / 2, 210);
+
+            // EJE DE ALINEACIÓN
+            pCtx.save();
+            pCtx.setLineDash([10, 10]);
+            pCtx.strokeStyle = 'rgba(0,0,0,0.1)';
+            pCtx.beginPath();
+            pCtx.moveTo(tempCanvas.width / 2, 250);
+            pCtx.lineTo(tempCanvas.width / 2, 3100);
+            pCtx.stroke();
+            pCtx.restore();
+
+            const angleStep = (Math.PI * 2) / total;
+
+            // FUNCIÓN AUXILIAR PARA DIBUJAR EL HUB CENTRAL
+            const drawCentralHub = (cx, cy) => {
+                const hubR = 50;
+                pCtx.save();
+                pCtx.beginPath();
+                pCtx.arc(cx, cy, hubR, 0, Math.PI * 2);
+                pCtx.lineWidth = 3;
+                pCtx.stroke();
+                
+                // Crosshair de centrado
+                pCtx.lineWidth = 1;
+                pCtx.beginPath();
+                pCtx.moveTo(cx - 60, cy); pCtx.lineTo(cx + 60, cy);
+                pCtx.moveTo(cx, cy - 60); pCtx.lineTo(cx, cy + 60);
+                pCtx.stroke();
+                
+                // Punto de perforación
+                pCtx.beginPath();
+                pCtx.arc(cx, cy, 6, 0, Math.PI * 2);
+                pCtx.fill();
+                pCtx.restore();
+            };
+
+            // --- DISCO EXTERIOR (BASE) ---
+            const outerCX = tempCanvas.width / 2;
+            const outerCY = 1000; 
+            const outerR = 760; 
+
+            // CONTORNO DOBLE (Línea de corte + Guía)
+            pCtx.lineWidth = 5;
+            pCtx.beginPath(); pCtx.arc(outerCX, outerCY, outerR, 0, Math.PI * 2); pCtx.stroke();
+            pCtx.save();
+            pCtx.setLineDash([15, 15]); pCtx.lineWidth = 1;
+            pCtx.beginPath(); pCtx.arc(outerCX, outerCY, outerR - 15, 0, Math.PI * 2); pCtx.stroke();
+            pCtx.restore();
+
+            for(let i = 0; i < total; i++) {
+                const angle = (i + 0.5) * angleStep - Math.PI / 2;
+                pCtx.beginPath();
+                pCtx.moveTo(outerCX + Math.cos(angle) * (outerR - 100), outerCY + Math.sin(angle) * (outerR - 100));
+                pCtx.lineTo(outerCX + Math.cos(angle) * outerR, outerCY + Math.sin(angle) * outerR);
+                pCtx.lineWidth = 2;
+                pCtx.stroke();
+            }
+
+            pCtx.font = 'bold 70px Inter';
+            ALPHABET.forEach((letter, i) => {
+                const angle = i * angleStep - Math.PI / 2;
+                const tx = outerCX + Math.cos(angle) * (outerR - 130); 
+                const ty = outerCY + Math.sin(angle) * (outerR - 130);
+                pCtx.save(); pCtx.translate(tx, ty); pCtx.rotate(angle + Math.PI/2); pCtx.fillText(letter, 0, 0); pCtx.restore();
+            });
+
+            drawCentralHub(outerCX, outerCY);
+            pCtx.font = 'bold 40px Inter';
+            pCtx.fillText('DISCO EXTERIOR (BASE)', outerCX, outerCY + outerR + 80);
+
+            // --- DISCO INTERIOR (MÓVIL) ---
+            const innerCX = tempCanvas.width / 2;
+            const innerCY = 2550; 
+            const innerR = 560; 
+
+            // CONTORNO DOBLE
+            pCtx.lineWidth = 5;
+            pCtx.beginPath(); pCtx.arc(innerCX, innerCY, innerR, 0, Math.PI * 2); pCtx.stroke();
+            pCtx.save();
+            pCtx.setLineDash([15, 15]); pCtx.lineWidth = 1;
+            pCtx.beginPath(); pCtx.arc(innerCX, innerCY, innerR - 15, 0, Math.PI * 2); pCtx.stroke();
+            pCtx.restore();
+
+            for(let i = 0; i < total; i++) {
+                const angle = (i + 0.5) * angleStep - Math.PI / 2;
+                pCtx.beginPath();
+                pCtx.moveTo(innerCX + Math.cos(angle) * (innerR - 80), innerCY + Math.sin(angle) * (innerR - 80));
+                pCtx.lineTo(innerCX + Math.cos(angle) * innerR, innerCY + Math.sin(angle) * innerR);
+                pCtx.stroke();
+            }
+
+            ALPHABET.forEach((letter, i) => {
+                const angle = i * angleStep - Math.PI / 2;
+                const tx = innerCX + Math.cos(angle) * (innerR - 80);
+                const ty = innerCY + Math.sin(angle) * (innerR - 80);
+                pCtx.save();
+                pCtx.translate(tx, ty); pCtx.rotate(angle + Math.PI/2);
+                pCtx.font = 'bold 55px Inter'; pCtx.fillText(letter, 0, 0);
+                pCtx.font = '28px "JetBrains Mono"'; pCtx.fillText(i, 0, 85);
+                pCtx.restore();
+            });
+
+            drawCentralHub(innerCX, innerCY);
+            pCtx.font = 'bold 40px Inter';
+            pCtx.fillText('DISCO INTERIOR (MÓVIL)', innerCX, innerCY + innerR + 80);
+
+            // INSTRUCCIONES
+            pCtx.textAlign = 'left';
+            const instX = 220; const footerY = 3280;
+            pCtx.font = 'bold 35px Inter'; pCtx.fillText('PROCESO DE ENSAMBLAJE:', instX, footerY);
+            pCtx.font = '30px Inter';
+            pCtx.fillText('✂️ 1. Recorta ambos discos por la línea sólida exterior gruesa.', instX, footerY + 60);
+            pCtx.fillText('📍 2. Perfora el círculo negro del centro (utiliza la cruz para guiarte).', instX, footerY + 110);
+            pCtx.fillText('⚙️ 3. Únelos con un pasador. El disco pequeño debe rotar sobre el grande.', instX, footerY + 160);
+
+            // CONVERSIÓN A PDF
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            const imgData = tempCanvas.toDataURL('image/jpeg', 0.95);
+            pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297);
+            pdf.save('plantilla_cifrador_A4_V98.pdf');
         }
 
         function getAngle(clientX, clientY) {
