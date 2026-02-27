@@ -113,19 +113,25 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-neutral-600 group-hover:text-neutral-400"><path d="m6 9 6 6 6-6"/></svg>
                 </button>
 
-                <div id="theme-dropdown" class="hidden absolute right-0 mt-3 w-64 bg-neutral-900/95 backdrop-blur-xl border border-neutral-800 rounded-3xl p-6 shadow-2xl z-50">
-                    <div class="flex justify-between items-center mb-4 px-1">
+                <div id="theme-dropdown" class="hidden absolute right-0 mt-3 w-72 bg-neutral-900/95 backdrop-blur-xl border border-neutral-800 rounded-3xl p-6 shadow-2xl z-50">
+                    <div class="flex justify-between items-center mb-6 px-1 border-b border-neutral-800/50 pb-3">
                         <div class="text-[8px] font-black uppercase tracking-widest text-neutral-600">Frecuencia Visual</div>
                         <button id="close-dropdown-btn" class="text-neutral-600 hover:text-white transition-colors p-1">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                         </button>
                     </div>
-                    <div class="grid grid-cols-3 gap-3 justify-items-center mb-6">
+                    
+                    <div class="grid grid-cols-5 gap-3 justify-items-center mb-6">
                         <div class="palette-btn active" data-color="#fbbf24" data-rgb="251, 191, 36" style="background-color: #fbbf24; color: #fbbf24;" title="Ámbar"></div>
                         <div class="palette-btn" data-color="#06b6d4" data-rgb="6, 182, 212" style="background-color: #06b6d4; color: #06b6d4;" title="Cian"></div>
                         <div class="palette-btn" data-color="#10b981" data-rgb="16, 185, 129" style="background-color: #10b981; color: #10b981;" title="Esmeralda"></div>
                         <div class="palette-btn" data-color="#f43f5e" data-rgb="244, 63, 94" style="background-color: #f43f5e; color: #f43f5e;" title="Rubí"></div>
                         <div class="palette-btn" data-color="#a855f7" data-rgb="168, 85, 247" style="background-color: #a855f7; color: #a855f7;" title="Amatista"></div>
+                        <!-- Nuevos Colores -->
+                        <div class="palette-btn" data-color="#f97316" data-rgb="249, 115, 22" style="background-color: #f97316; color: #f97316;" title="Naranja"></div>
+                        <div class="palette-btn" data-color="#6366f1" data-rgb="99, 102, 241" style="background-color: #6366f1; color: #6366f1;" title="Indigo"></div>
+                        <div class="palette-btn" data-color="#d946ef" data-rgb="217, 70, 239" style="background-color: #d946ef; color: #d946ef;" title="Magenta"></div>
+                        <div class="palette-btn" data-color="#84cc16" data-rgb="132, 204, 22" style="background-color: #84cc16; color: #84cc16;" title="Lima"></div>
                         <div class="palette-btn" data-color="#ffffff" data-rgb="255, 255, 255" style="background-color: #ffffff; color: #ffffff;" title="Puro"></div>
                     </div>
 
@@ -486,7 +492,8 @@
             pCtx.beginPath(); pCtx.arc(iCX, iCY, iR, 0, Math.PI * 2); pCtx.lineWidth = 6; pCtx.stroke();
             for(let i = 0; i < total; i++) {
                 const a = (i + 0.5) * angleStep - Math.PI / 2;
-                pCtx.beginPath(); pCtx.moveTo(iCX + Math.cos(a) * 150, iCY + Math.sin(a) * 150);
+                pCtx.beginPath();
+                pCtx.moveTo(iCX + Math.cos(a) * 150, iCY + Math.sin(a) * 150);
                 pCtx.lineTo(iCX + Math.cos(a) * iR, iCY + Math.sin(a) * iR);
                 pCtx.lineWidth = 2; pCtx.stroke();
             }
