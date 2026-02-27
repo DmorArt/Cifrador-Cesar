@@ -149,7 +149,7 @@
 
         <main class="w-full max-w-[1850px] grid grid-cols-1 lg:grid-cols-12 gap-6 lg:flex-1 items-stretch">
             
-            <!-- CONTENEDOR DEL DISCO PROTAGONISTA - Optimizados paddings para móvil -->
+            <!-- CONTENEDOR DEL DISCO PROTAGONISTA -->
             <div class="lg:col-span-8 flex flex-col md:flex-row items-center justify-center bg-gradient-to-br from-neutral-900/40 to-black p-2 sm:p-4 lg:p-12 rounded-[2.5rem] lg:rounded-[4rem] border border-neutral-800/30 shadow-2xl relative overflow-hidden group">
                 <div id="ambient-glow" class="absolute inset-0 transition-all duration-700 pointer-events-none"></div>
                 <div class="absolute top-0 right-0 w-64 h-64 theme-glow-bg rounded-full blur-[120px] pointer-events-none opacity-20"></div>
@@ -568,127 +568,178 @@
             ctx.restore();
         }
 
+        // GENERACIÓN DE PLANTILLA PDF MEJORADA (V101 - CON SEPARADORES Y NÚMEROS)
         function generatePrintablePDF() {
             const tempCanvas = document.createElement('canvas');
-            tempCanvas.width = 2480; tempCanvas.height = 3508;
+            tempCanvas.width = 2480; 
+            tempCanvas.height = 3508;
             const pCtx = tempCanvas.getContext('2d');
-            pCtx.fillStyle = '#FFFFFF'; pCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
-            pCtx.strokeStyle = '#000000'; pCtx.lineWidth = 4; pCtx.strokeRect(80, 80, 2320, 3348);
             
-            pCtx.fillStyle = '#000000'; pCtx.font = 'bold 50px Inter'; pCtx.textAlign = 'center';
+            pCtx.fillStyle = '#FFFFFF';
+            pCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+            
+            // MARCO TÉCNICO
+            pCtx.strokeStyle = '#000000';
+            pCtx.lineWidth = 4;
+            pCtx.strokeRect(80, 80, 2320, 3348);
+            
+            // TÍTULO
+            pCtx.fillStyle = '#000000';
+            pCtx.font = 'bold 50px Inter';
+            pCtx.textAlign = 'center';
             pCtx.fillText('PLANTILLA RECORTABLE: CIFRADOR CÉSAR', tempCanvas.width / 2, 160);
+            pCtx.font = '30px Inter';
+            pCtx.fillText('LABORATORIO DE CRIPTOGRAFÍA VISUAL // DANIEL MORISIO', tempCanvas.width / 2, 210);
 
             const angleStep = (Math.PI * 2) / total;
+
             const drawCentralHub = (cx, cy) => {
                 const hubR = 50;
-                pCtx.beginPath(); pCtx.arc(cx, cy, hubR, 0, Math.PI * 2); pCtx.lineWidth = 3; pCtx.stroke();
-                pCtx.beginPath(); pCtx.moveTo(cx - 60, cy); pCtx.lineTo(cx + 60, cy); pCtx.moveTo(cx, cy - 60); pCtx.lineTo(cx, cy + 60); pCtx.lineWidth = 1; pCtx.stroke();
-                pCtx.beginPath(); pCtx.arc(cx, cy, 6, 0, Math.PI * 2); pCtx.fill();
+                pCtx.save();
+                pCtx.beginPath();
+                pCtx.arc(cx, cy, hubR, 0, Math.PI * 2);
+                pCtx.lineWidth = 3;
+                pCtx.stroke();
+                
+                pCtx.lineWidth = 1;
+                pCtx.beginPath();
+                pCtx.moveTo(cx - 70, cy); pCtx.lineTo(cx + 70, cy);
+                pCtx.moveTo(cx, cy - 70); pCtx.lineTo(cx, cy + 70);
+                pCtx.stroke();
+                
+                pCtx.beginPath();
+                pCtx.arc(cx, cy, 8, 0, Math.PI * 2);
+                pCtx.fill();
+                pCtx.restore();
             };
 
-            const oCX = tempCanvas.width / 2; const oCY = 1000; const oR = 760; 
-            pCtx.beginPath(); pCtx.arc(oCX, oCY, oR, 0, Math.PI * 2); pCtx.lineWidth = 5; pCtx.stroke();
+            // --- DISCO EXTERIOR (BASE) ---
+            const oCX = tempCanvas.width / 2;
+            const oCY = 1000; 
+            const oR = 760; 
+
+            pCtx.lineWidth = 6;
+            pCtx.beginPath(); pCtx.arc(oCX, oCY, oR, 0, Math.PI * 2); pCtx.stroke();
+            
+            // Líneas de separación radiales para el disco base
+            for(let i = 0; i < total; i++) {
+                const a = (i + 0.5) * angleStep - Math.PI / 2;
+                pCtx.beginPath();
+                pCtx.moveTo(oCX + Math.cos(a) * 580, oCY + Math.sin(a) * 580);
+                pCtx.lineTo(oCX + Math.cos(a) * oR, oCY + Math.sin(a) * oR);
+                pCtx.lineWidth = 2;
+                pCtx.stroke();
+            }
+
             pCtx.font = 'bold 70px Inter';
             ALPHABET.forEach((letter, i) => {
-                const angle = i * angleStep - Math.PI / 2;
-                const tx = oCX + Math.cos(angle) * (oR - 130); const ty = oCY + Math.sin(angle) * (oR - 130);
-                pCtx.save(); pCtx.translate(tx, ty); pCtx.rotate(angle + Math.PI/2); pCtx.fillText(letter, 0, 0); pCtx.restore();
+                const a = i * angleStep - Math.PI / 2;
+                const tx = oCX + Math.cos(a) * (oR - 130); 
+                const ty = oCY + Math.sin(a) * (oR - 130);
+                pCtx.save(); pCtx.translate(tx, ty); pCtx.rotate(a + Math.PI/2); pCtx.fillText(letter, 0, 0); pCtx.restore();
             });
+
             drawCentralHub(oCX, oCY);
+            pCtx.font = 'bold 40px Inter';
+            pCtx.fillText('DISCO EXTERIOR (BASE)', oCX, oCY + oR + 80);
 
-            const iCX = tempCanvas.width / 2; const iCY = 2550; const iR = 560; 
+            // --- DISCO INTERIOR (MÓVIL) ---
+            const iCX = tempCanvas.width / 2;
+            const iCY = 2550; 
+            const iR = 560; 
+
+            pCtx.lineWidth = 6;
             pCtx.beginPath(); pCtx.arc(iCX, iCY, iR, 0, Math.PI * 2); pCtx.stroke();
-            ALPHABET.forEach((letter, i) => {
-                const angle = i * angleStep - Math.PI / 2;
-                const tx = iCX + Math.cos(angle) * (iR - 80); const ty = iCY + Math.sin(angle) * (iR - 80);
-                pCtx.save(); pCtx.translate(tx, ty); pCtx.rotate(angle + Math.PI/2); pCtx.font = 'bold 55px Inter'; pCtx.fillText(letter, 0, 0); pCtx.restore();
-            });
-            drawCentralHub(iCX, iCY);
 
-            const { jsPDF } = window.jspdf; const pdf = new jsPDF('p', 'mm', 'a4');
+            // Líneas de separación radiales para el disco móvil
+            for(let i = 0; i < total; i++) {
+                const a = (i + 0.5) * angleStep - Math.PI / 2;
+                pCtx.beginPath();
+                pCtx.moveTo(iCX + Math.cos(a) * 150, iCY + Math.sin(a) * 150);
+                pCtx.lineTo(iCX + Math.cos(a) * iR, iCY + Math.sin(a) * iR);
+                pCtx.lineWidth = 2;
+                pCtx.stroke();
+            }
+
+            ALPHABET.forEach((letter, i) => {
+                const a = i * angleStep - Math.PI / 2;
+                const tx = iCX + Math.cos(a) * (iR - 100);
+                const ty = iCY + Math.sin(a) * (iR - 100);
+                pCtx.save();
+                pCtx.translate(tx, ty); pCtx.rotate(a + Math.PI/2);
+                pCtx.font = 'bold 60px Inter'; pCtx.fillText(letter, 0, 0);
+                // Agregar número debajo de la letra
+                pCtx.font = '28px "JetBrains Mono"'; pCtx.fillText(i, 0, 80);
+                pCtx.restore();
+            });
+
+            drawCentralHub(iCX, iCY);
+            pCtx.font = 'bold 40px Inter';
+            pCtx.fillText('DISCO INTERIOR (MÓVIL)', iCX, iCY + iR + 80);
+
+            // INSTRUCCIONES
+            pCtx.textAlign = 'left';
+            const instX = 220; const footerY = 3280;
+            pCtx.font = 'bold 35px Inter'; pCtx.fillText('ENSAMBLAJE:', instX, footerY);
+            pCtx.font = '30px Inter';
+            pCtx.fillText('1. Recorta los discos por la línea negra gruesa.', instX, footerY + 50);
+            pCtx.fillText('2. Perfora el centro y únelos con un pasador.', instX, footerY + 95);
+
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF('p', 'mm', 'a4');
             pdf.addImage(tempCanvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, 210, 297);
-            pdf.save('plantilla_cifrador_A4.pdf');
+            pdf.save('Caesar_Cipher_Blueprint_V101.pdf');
         }
 
         function getAngle(clientX, clientY) {
             const rect = canvas.getBoundingClientRect();
-            const x = clientX - rect.left - rect.width / 2;
-            const y = clientY - rect.top - rect.height / 2;
-            return Math.atan2(y, x) * (180 / Math.PI);
-        }
-
-        function encrypt(text, s) {
-            return text.toUpperCase().split("").map(char => {
-                const idx = ALPHABET.indexOf(char); if (idx === -1) return char;
-                let newIdx = (idx + s) % total; if (newIdx < 0) newIdx += total;
-                return ALPHABET[newIdx];
-            }).join("");
+            return Math.atan2(clientY - (rect.top + rect.height/2), clientX - (rect.left + rect.width/2)) * (180/Math.PI);
         }
 
         function update() {
-            const res = encrypt(state.message, state.shift);
-            outputEl.innerHTML = res ? res : '<span class="text-neutral-800 italic text-sm font-sans">El texto aparecerá aquí...</span>';
+            const res = state.message.toUpperCase().split("").map(c => {
+                const i = ALPHABET.indexOf(c); return i === -1 ? c : ALPHABET[(i + state.shift) % total];
+            }).join("");
+            outputEl.innerHTML = res || '<span class="text-neutral-800 italic text-sm font-sans">El texto aparecerá aquí...</span>';
             shiftDisplay.textContent = state.shift.toString().padStart(2, '0');
             if (state.shift !== state.lastShift) { playTick(); state.lastShift = state.shift; }
-            if (state.isDragging) {
-                diskGlow.style.boxShadow = `0 0 50px 15px rgba(${state.themeRGB}, 0.2)`;
-                ambientGlow.style.backgroundColor = `rgba(${state.themeRGB}, 0.01)`;
-            } else { diskGlow.style.boxShadow = 'none'; ambientGlow.style.backgroundColor = 'transparent'; }
+            if (state.isDragging) diskGlow.style.boxShadow = `0 0 50px 15px rgba(${state.themeRGB}, 0.2)`;
+            else diskGlow.style.boxShadow = 'none';
             draw();
         }
 
         const handleStart = (e) => {
             state.isDragging = true;
-            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-            state.startAngle = getAngle(clientX, clientY) - state.rotation;
-            canvas.style.cursor = 'grabbing';
-            update();
+            const cX = e.touches ? e.touches[0].clientX : e.clientX; const cY = e.touches ? e.touches[0].clientY : e.clientY;
+            state.startAngle = getAngle(cX, cY) - state.rotation; canvas.style.cursor = 'grabbing';
         };
 
         const handleMove = (e) => {
             if (!state.isDragging) return;
-            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-            const angle = getAngle(clientX, clientY);
-            state.rotation = angle - state.startAngle;
+            const cX = e.touches ? e.touches[0].clientX : e.clientX; const cY = e.touches ? e.touches[0].clientY : e.clientY;
+            state.rotation = getAngle(cX, cY) - state.startAngle;
             let normRot = ((-state.rotation % 360) + 360) % 360;
-            state.shift = Math.round(normRot / (360 / total)) % total;
-            update();
+            state.shift = Math.round(normRot / (360 / total)) % total; update();
         };
 
         const handleEnd = () => {
-            if (!state.isDragging) return;
-            state.isDragging = false;
-            canvas.style.cursor = 'grab';
-            state.rotation = -(state.shift * (360 / total));
-            update();
+            if (!state.isDragging) return; state.isDragging = false; canvas.style.cursor = 'grab';
+            state.rotation = -(state.shift * (360 / total)); update();
         };
 
-        canvas.addEventListener('mousedown', handleStart);
-        window.addEventListener('mousemove', handleMove);
-        window.addEventListener('mouseup', handleEnd);
-        canvas.addEventListener('touchstart', handleStart, {passive: false});
-        window.addEventListener('touchmove', handleMove, {passive: false});
-        window.addEventListener('touchend', handleEnd);
-
+        canvas.addEventListener('mousedown', handleStart); window.addEventListener('mousemove', handleMove); window.addEventListener('mouseup', handleEnd);
+        canvas.addEventListener('touchstart', handleStart, {passive: false}); window.addEventListener('touchmove', handleMove, {passive: false}); window.addEventListener('touchend', handleEnd);
         inputEl.addEventListener('input', (e) => { state.message = e.target.value; update(); });
         diskResetBtn.addEventListener('click', () => { state.shift = 0; state.rotation = 0; update(); playTick(); });
         resetBtn.addEventListener('click', () => { state.message = ''; state.shift = 0; state.rotation = 0; inputEl.value = ''; update(); });
-
         copyBtn.addEventListener('click', () => {
-            const text = outputEl.innerText;
-            if (text && !text.includes("El texto aparecerá aquí")) {
-                const tempTextArea = document.createElement("textarea");
-                tempTextArea.value = text; document.body.appendChild(tempTextArea);
-                tempTextArea.select(); document.execCommand("copy");
-                document.body.removeChild(tempTextArea);
+            const t = outputEl.innerText; if (t && !t.includes("aquí")) {
+                const el = document.createElement("textarea"); el.value = t; document.body.appendChild(el);
+                el.select(); document.execCommand("copy"); document.body.removeChild(el);
                 copyBtn.innerText = "¡OK!"; setTimeout(() => copyBtn.innerText = "Copiar", 1000);
             }
         });
-
-        window.addEventListener('resize', draw);
-        draw(); update();
+        window.addEventListener('resize', draw); draw(); update();
     </script>
 </body>
 </html>
