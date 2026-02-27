@@ -20,6 +20,7 @@
             color: #e5e5e5;
             font-family: 'Inter', sans-serif;
             overflow-x: hidden;
+            /* Scroll habilitado para el body */
             -webkit-overflow-scrolling: touch;
         }
 
@@ -56,11 +57,9 @@
             -webkit-user-drag: none;
         }
 
-        /* Permitimos scroll por defecto en el canvas. 
-           La lógica JS se encargará de detenerlo solo cuando sea necesario.
-        */
+        /* Bloqueamos el scroll solo en el canvas para rotación táctil precisa */
         #mainDisk {
-            touch-action: auto;
+            touch-action: none;
         }
 
         #theme-dropdown {
@@ -223,9 +222,15 @@
         const total = ALPHABET.length;
         
         let state = {
-            shift: 3, lastShift: 3, rotation: 3 * (360 / total),
-            message: '', isDragging: false, startAngle: 0,
-            themeColor: '#fbbf24', themeRGB: '251, 191, 36', isMuted: false
+            shift: 3,
+            lastShift: 3,
+            rotation: 3 * (360 / total),
+            message: '',
+            isDragging: false,
+            startAngle: 0,
+            themeColor: '#fbbf24',
+            themeRGB: '251, 191, 36',
+            isMuted: false
         };
 
         const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -235,16 +240,33 @@
             if (state.isMuted) return;
             if (!audioCtx) audioCtx = new AudioContext();
             if (audioCtx.state === 'suspended') audioCtx.resume();
+            
             const now = audioCtx.currentTime;
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = 'triangle';
-            osc.frequency.setValueAtTime(250, now);
-            osc.frequency.exponentialRampToValueAtTime(40, now + 0.08);
-            gain.gain.setValueAtTime(0.38, now);
-            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
-            osc.connect(gain); gain.connect(audioCtx.destination);
-            osc.start(now); osc.stop(now + 0.08);
+            const osc1 = audioCtx.createOscillator();
+            const gain1 = audioCtx.createGain();
+            osc1.type = 'triangle';
+            osc1.frequency.setValueAtTime(50, now);
+            osc1.frequency.exponentialRampToValueAtTime(40, now + 0.08);
+            gain1.gain.setValueAtTime(0.28, now);
+            gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+            
+            const osc2 = audioCtx.createOscillator();
+            const gain2 = audioCtx.createGain();
+            osc2.type = 'sine';
+            osc2.frequency.setValueAtTime(2200, now);
+            osc2.frequency.exponentialRampToValueAtTime(1800, now + 0.03);
+            gain2.gain.setValueAtTime(0.06, now);
+            gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.03);
+
+            osc1.connect(gain1);
+            gain1.connect(audioCtx.destination);
+            osc2.connect(gain2);
+            gain2.connect(audioCtx.destination);
+            
+            osc1.start(now);
+            osc1.stop(now + 0.08);
+            osc2.start(now);
+            osc2.stop(now + 0.03);
         }
 
         const canvas = document.getElementById('mainDisk');
@@ -444,6 +466,36 @@
             }
             ctx.restore();
 
+            // FLECHAS INDICADORAS
+            ctx.save();
+            ctx.strokeStyle = 'rgba(160, 160, 160, 0.2)'; 
+            ctx.lineWidth = 14.0; 
+            ctx.lineCap = 'round';
+            const arrowRadius = knobRadius + 55;
+            const arrowSpan = 0.85; 
+
+            const drawIndicator = (centerAngle) => {
+                const start = centerAngle - arrowSpan/2;
+                const end = centerAngle + arrowSpan/2;
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, arrowRadius, start, end);
+                ctx.stroke();
+                const pSize = 22;
+                ctx.beginPath();
+                ctx.moveTo(centerX + Math.cos(end - 0.1) * (arrowRadius - pSize), centerY + Math.sin(end - 0.1) * (arrowRadius - pSize));
+                ctx.lineTo(centerX + Math.cos(end) * arrowRadius, centerY + Math.sin(end) * arrowRadius);
+                ctx.lineTo(centerX + Math.cos(end - 0.1) * (arrowRadius + pSize), centerY + Math.sin(end - 0.1) * (arrowRadius + pSize));
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(centerX + Math.cos(start + 0.1) * (arrowRadius - pSize), centerY + Math.sin(start + 0.1) * (arrowRadius - pSize));
+                ctx.lineTo(centerX + Math.cos(start) * arrowRadius, centerY + Math.sin(start) * arrowRadius);
+                ctx.lineTo(centerX + Math.cos(start + 0.1) * (arrowRadius + pSize), centerY + Math.sin(start + 0.1) * (arrowRadius + pSize));
+                ctx.stroke();
+            };
+            drawIndicator(0);
+            drawIndicator(Math.PI);
+            ctx.restore();
+
             // Índices Numéricos
             ctx.font = `500 ${radius * 0.054}px "JetBrains Mono"`;
             ctx.fillStyle = `rgba(${state.themeRGB}, 0.85)`;
@@ -472,10 +524,45 @@
                 ctx.restore();
             });
 
+            // Perilla Central
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, knobRadius + 12, 0, Math.PI * 2);
+            let housingGrad = ctx.createRadialGradient(centerX, centerY, knobRadius, centerX, centerY, knobRadius + 12);
+            housingGrad.addColorStop(0, '#000');
+            housingGrad.addColorStop(1, '#222');
+            ctx.fillStyle = housingGrad;
+            ctx.fill();
+
             ctx.beginPath();
             ctx.arc(centerX, centerY, knobRadius, 0, Math.PI * 2);
-            ctx.fillStyle = '#0a0a0a';
+            let knobSurfaceGrad = ctx.createRadialGradient(centerX - knobRadius*0.2, centerY - knobRadius*0.2, 0, centerX, centerY, knobRadius);
+            knobSurfaceGrad.addColorStop(0, '#2a2a2a');
+            knobSurfaceGrad.addColorStop(0.7, '#151515');
+            knobSurfaceGrad.addColorStop(1, '#0a0a0a');
+            ctx.fillStyle = knobSurfaceGrad;
+            ctx.shadowColor = 'rgba(0,0,0,0.9)';
+            ctx.shadowBlur = 30;
             ctx.fill();
+            ctx.shadowBlur = 0;
+
+            const ledRadius = 10;
+            const ledDistance = knobRadius * 0.78;
+            const ledAngle = -Math.PI / 2;
+            const lx = centerX + Math.cos(ledAngle) * ledDistance;
+            const ly = centerY + Math.sin(ledAngle) * ledDistance;
+
+            ctx.beginPath();
+            ctx.arc(lx, ly, ledRadius, 0, Math.PI * 2);
+            let ledLight = ctx.createRadialGradient(lx - 2, ly - 2, 0, lx, ly, ledRadius);
+            ledLight.addColorStop(0, '#fff');
+            ledLight.addColorStop(0.3, '#888'); 
+            ledLight.addColorStop(1, '#000');
+            ctx.fillStyle = ledLight;
+            ctx.shadowColor = 'rgba(160, 160, 160, 0.4)'; 
+            ctx.shadowBlur = 15;
+            ctx.fill();
+            ctx.shadowBlur = 0;
+
             ctx.restore(); 
 
             ctx.save();
@@ -492,62 +579,127 @@
             ctx.restore();
         }
 
+        // GENERACIÓN DE PLANTILLA PDF MEJORADA (V101 - CON SEPARADORES Y NÚMEROS)
         function generatePrintablePDF() {
             const tempCanvas = document.createElement('canvas');
             tempCanvas.width = 2480; 
             tempCanvas.height = 3508;
             const pCtx = tempCanvas.getContext('2d');
-            pCtx.fillStyle = '#FFFFFF'; pCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
-            pCtx.strokeStyle = '#000000'; pCtx.lineWidth = 4; pCtx.strokeRect(80, 80, 2320, 3348);
-            pCtx.fillStyle = '#000000'; pCtx.font = 'bold 50px Inter'; pCtx.textAlign = 'center';
+            
+            pCtx.fillStyle = '#FFFFFF';
+            pCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+            
+            // MARCO TÉCNICO
+            pCtx.strokeStyle = '#000000';
+            pCtx.lineWidth = 4;
+            pCtx.strokeRect(80, 80, 2320, 3348);
+            
+            // TÍTULO
+            pCtx.fillStyle = '#000000';
+            pCtx.font = 'bold 50px Inter';
+            pCtx.textAlign = 'center';
             pCtx.fillText('PLANTILLA RECORTABLE: CIFRADOR CÉSAR', tempCanvas.width / 2, 160);
+            pCtx.font = '30px Inter';
+            pCtx.fillText('LABORATORIO DE CRIPTOGRAFÍA VISUAL // DANIEL MORISIO', tempCanvas.width / 2, 210);
 
             const angleStep = (Math.PI * 2) / total;
+
             const drawCentralHub = (cx, cy) => {
                 const hubR = 50;
-                pCtx.save(); pCtx.beginPath(); pCtx.arc(cx, cy, hubR, 0, Math.PI * 2); pCtx.lineWidth = 3; pCtx.stroke();
-                pCtx.lineWidth = 1; pCtx.beginPath(); pCtx.moveTo(cx - 70, cy); pCtx.lineTo(cx + 70, cy);
-                pCtx.moveTo(cx, cy - 70); pCtx.lineTo(cx, cy + 70); pCtx.stroke();
-                pCtx.beginPath(); pCtx.arc(cx, cy, 8, 0, Math.PI * 2); pCtx.fill(); pCtx.restore();
+                pCtx.save();
+                pCtx.beginPath();
+                pCtx.arc(cx, cy, hubR, 0, Math.PI * 2);
+                pCtx.lineWidth = 3;
+                pCtx.stroke();
+                
+                pCtx.lineWidth = 1;
+                pCtx.beginPath();
+                pCtx.moveTo(cx - 70, cy); pCtx.lineTo(cx + 70, cy);
+                pCtx.moveTo(cx, cy - 70); pCtx.lineTo(cx, cy + 70);
+                pCtx.stroke();
+                
+                pCtx.beginPath();
+                pCtx.arc(cx, cy, 8, 0, Math.PI * 2);
+                pCtx.fill();
+                pCtx.restore();
             };
 
-            const oCX = tempCanvas.width / 2, oCY = 1000, oR = 760; 
-            pCtx.beginPath(); pCtx.arc(oCX, oCY, oR, 0, Math.PI * 2); pCtx.lineWidth = 6; pCtx.stroke();
+            // --- DISCO EXTERIOR (BASE) ---
+            const oCX = tempCanvas.width / 2;
+            const oCY = 1000; 
+            const oR = 760; 
+
+            pCtx.lineWidth = 6;
+            pCtx.beginPath(); pCtx.arc(oCX, oCY, oR, 0, Math.PI * 2); pCtx.stroke();
+            
+            // Líneas de separación radiales para el disco base
             for(let i = 0; i < total; i++) {
                 const a = (i + 0.5) * angleStep - Math.PI / 2;
-                pCtx.beginPath(); pCtx.moveTo(oCX + Math.cos(a) * 580, oCY + Math.sin(a) * 580);
+                pCtx.beginPath();
+                pCtx.moveTo(oCX + Math.cos(a) * 580, oCY + Math.sin(a) * 580);
                 pCtx.lineTo(oCX + Math.cos(a) * oR, oCY + Math.sin(a) * oR);
-                pCtx.lineWidth = 2; pCtx.stroke();
+                pCtx.lineWidth = 2;
+                pCtx.stroke();
             }
+
             pCtx.font = 'bold 70px Inter';
             ALPHABET.forEach((letter, i) => {
                 const a = i * angleStep - Math.PI / 2;
-                const tx = oCX + Math.cos(a) * (oR - 130); const ty = oCY + Math.sin(a) * (oR - 130);
+                const tx = oCX + Math.cos(a) * (oR - 130); 
+                const ty = oCY + Math.sin(a) * (oR - 130);
                 pCtx.save(); pCtx.translate(tx, ty); pCtx.rotate(a + Math.PI/2); pCtx.fillText(letter, 0, 0); pCtx.restore();
             });
-            drawCentralHub(oCX, oCY);
 
-            const iCX = tempCanvas.width / 2, iCY = 2550, iR = 560; 
-            pCtx.beginPath(); pCtx.arc(iCX, iCY, iR, 0, Math.PI * 2); pCtx.lineWidth = 6; pCtx.stroke();
+            drawCentralHub(oCX, oCY);
+            pCtx.font = 'bold 40px Inter';
+            pCtx.fillText('DISCO EXTERIOR (BASE)', oCX, oCY + oR + 80);
+
+            // --- DISCO INTERIOR (MÓVIL) ---
+            const iCX = tempCanvas.width / 2;
+            const iCY = 2550; 
+            const iR = 560; 
+
+            pCtx.lineWidth = 6;
+            pCtx.beginPath(); pCtx.arc(iCX, iCY, iR, 0, Math.PI * 2); pCtx.stroke();
+
+            // Líneas de separación radiales para el disco móvil
             for(let i = 0; i < total; i++) {
                 const a = (i + 0.5) * angleStep - Math.PI / 2;
-                pCtx.beginPath(); pCtx.moveTo(iCX + Math.cos(a) * 150, iCY + Math.sin(a) * 150);
+                pCtx.beginPath();
+                pCtx.moveTo(iCX + Math.cos(a) * 150, iCY + Math.sin(a) * 150);
                 pCtx.lineTo(iCX + Math.cos(a) * iR, iCY + Math.sin(a) * iR);
-                pCtx.lineWidth = 2; pCtx.stroke();
+                pCtx.lineWidth = 2;
+                pCtx.stroke();
             }
+
             ALPHABET.forEach((letter, i) => {
                 const a = i * angleStep - Math.PI / 2;
-                const tx = iCX + Math.cos(a) * (iR - 100); const ty = iCY + Math.sin(a) * (iR - 100);
-                pCtx.save(); pCtx.translate(tx, ty); pCtx.rotate(a + Math.PI/2);
+                const tx = iCX + Math.cos(a) * (iR - 100);
+                const ty = iCY + Math.sin(a) * (iR - 100);
+                pCtx.save();
+                pCtx.translate(tx, ty); pCtx.rotate(a + Math.PI/2);
                 pCtx.font = 'bold 60px Inter'; pCtx.fillText(letter, 0, 0);
-                pCtx.font = '28px "JetBrains Mono"'; pCtx.fillText(i, 0, 80); pCtx.restore();
+                // Agregar número debajo de la letra
+                pCtx.font = '28px "JetBrains Mono"'; pCtx.fillText(i, 0, 80);
+                pCtx.restore();
             });
+
             drawCentralHub(iCX, iCY);
+            pCtx.font = 'bold 40px Inter';
+            pCtx.fillText('DISCO INTERIOR (MÓVIL)', iCX, iCY + iR + 80);
+
+            // INSTRUCCIONES
+            pCtx.textAlign = 'left';
+            const instX = 220; const footerY = 3280;
+            pCtx.font = 'bold 35px Inter'; pCtx.fillText('ENSAMBLAJE:', instX, footerY);
+            pCtx.font = '30px Inter';
+            pCtx.fillText('1. Recorta los discos por la línea negra gruesa.', instX, footerY + 50);
+            pCtx.fillText('2. Perfora el centro y únelos con un pasador.', instX, footerY + 95);
 
             const { jsPDF } = window.jspdf;
             const pdf = new jsPDF('p', 'mm', 'a4');
             pdf.addImage(tempCanvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, 210, 297);
-            pdf.save('Caesar_Cipher_Blueprint.pdf');
+            pdf.save('Caesar_Cipher_Blueprint_V101.pdf');
         }
 
         function getAngle(clientX, clientY) {
@@ -572,56 +724,38 @@
             const cX = e.touches ? e.touches[0].clientX : e.clientX; 
             const cY = e.touches ? e.touches[0].clientY : e.clientY;
             
+            // Calculamos la distancia desde el punto de contacto al centro del canvas
             const dx = cX - (rect.left + rect.width / 2);
             const dy = cY - (rect.top + rect.height / 2);
             const dist = Math.sqrt(dx * dx + dy * dy);
             
-            // Radio del disco interno (ámbar)
+            // Radio del disco interno (ámbar) en píxeles reales de la pantalla
+            // 0.94 (radius factor) * 0.68 (innerR factor) * (ancho visual / 2)
             const innerDiskLimit = (rect.width / 2) * 0.94 * 0.68;
 
+            // Solo iniciamos el arrastre si el contacto ocurre dentro del área del disco ámbar
             if (dist <= innerDiskLimit) {
-                // Si el toque es sobre el disco ámbar, bloqueamos scroll e iniciamos giro
-                if (e.cancelable) e.preventDefault();
                 state.isDragging = true;
                 state.startAngle = getAngle(cX, cY) - state.rotation; 
                 canvas.style.cursor = 'grabbing';
-                update();
-            } else {
-                // Si el toque es sobre letras blancas, NO activamos dragging ni preventDefault.
-                // El navegador procederá con el scroll natural.
-                state.isDragging = false;
             }
         };
 
         const handleMove = (e) => {
             if (!state.isDragging) return;
-            // Durante el giro, debemos seguir bloqueando el scroll para que el dedo no mueva la página
-            if (e.cancelable) e.preventDefault();
-            const cX = e.touches ? e.touches[0].clientX : e.clientX; 
-            const cY = e.touches ? e.touches[0].clientY : e.clientY;
+            const cX = e.touches ? e.touches[0].clientX : e.clientX; const cY = e.touches ? e.touches[0].clientY : e.clientY;
             state.rotation = getAngle(cX, cY) - state.startAngle;
             let normRot = ((-state.rotation % 360) + 360) % 360;
-            state.shift = Math.round(normRot / (360 / total)) % total; 
-            update();
+            state.shift = Math.round(normRot / (360 / total)) % total; update();
         };
 
         const handleEnd = () => {
-            if (!state.isDragging) return; 
-            state.isDragging = false; 
-            canvas.style.cursor = 'grab';
-            state.rotation = -(state.shift * (360 / total)); 
-            update();
+            if (!state.isDragging) return; state.isDragging = false; canvas.style.cursor = 'grab';
+            state.rotation = -(state.shift * (360 / total)); update();
         };
 
-        canvas.addEventListener('mousedown', handleStart); 
-        window.addEventListener('mousemove', handleMove); 
-        window.addEventListener('mouseup', handleEnd);
-        
-        // Importante: passive: false permite usar preventDefault() para bloquear scroll solo cuando queremos girar
-        canvas.addEventListener('touchstart', handleStart, {passive: false}); 
-        window.addEventListener('touchmove', handleMove, {passive: false}); 
-        window.addEventListener('touchend', handleEnd);
-
+        canvas.addEventListener('mousedown', handleStart); window.addEventListener('mousemove', handleMove); window.addEventListener('mouseup', handleEnd);
+        canvas.addEventListener('touchstart', handleStart, {passive: false}); window.addEventListener('touchmove', handleMove, {passive: false}); window.addEventListener('touchend', handleEnd);
         inputEl.addEventListener('input', (e) => { state.message = e.target.value; update(); });
         diskResetBtn.addEventListener('click', () => { state.shift = 0; state.rotation = 0; update(); playTick(); });
         resetBtn.addEventListener('click', () => { state.message = ''; state.shift = 0; state.rotation = 0; inputEl.value = ''; update(); });
