@@ -94,9 +94,9 @@
 </head>
 <body class="selection:bg-neutral-500/30">
 
-    <div class="min-h-screen p-4 lg:p-6 flex flex-col items-center justify-start lg:justify-center">
+    <div class="min-h-screen p-2 sm:p-4 lg:p-6 flex flex-col items-center justify-start lg:justify-center">
         
-        <header class="w-full max-w-[1850px] flex flex-col sm:flex-row justify-between items-center mb-8 lg:mb-6 gap-6 px-4">
+        <header class="w-full max-w-[1850px] flex flex-col sm:flex-row justify-between items-center mb-6 lg:mb-6 gap-6 px-4">
             <div class="flex items-center gap-5 w-full sm:w-auto">
                 <div class="theme-bg p-3 rounded-2xl shadow-xl shadow-black/50 transition-colors duration-500">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
@@ -132,7 +132,7 @@
                     <button id="download-printable-btn" class="w-full mb-3 flex items-center justify-between bg-black/40 p-3 rounded-xl border border-neutral-800/50 hover:bg-neutral-800/40 transition-all group/tool">
                         <div class="flex items-center gap-3">
                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-neutral-500 group-hover/tool:text-white"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
-                            <span class="text-[9px] font-bold uppercase tracking-widest text-neutral-400 group-hover/tool:text-neutral-200">Descargar Plantilla (PDF)</span>
+                            <span class="text-[9px] font-bold uppercase tracking-widest text-neutral-400 group-hover/tool:text-neutral-200">Descargar PDF</span>
                         </div>
                     </button>
 
@@ -147,24 +147,24 @@
             </div>
         </header>
 
-        <main class="w-full max-w-[1850px] grid grid-cols-1 lg:grid-cols-12 gap-8 lg:flex-1 items-stretch">
+        <main class="w-full max-w-[1850px] grid grid-cols-1 lg:grid-cols-12 gap-6 lg:flex-1 items-stretch">
             
-            <!-- CONTENEDOR DEL DISCO PROTAGONISTA -->
-            <div class="lg:col-span-8 flex flex-col md:flex-row items-center justify-center bg-gradient-to-br from-neutral-900/40 to-black p-4 lg:p-12 rounded-[3rem] lg:rounded-[4rem] border border-neutral-800/30 shadow-2xl relative overflow-hidden group">
+            <!-- CONTENEDOR DEL DISCO PROTAGONISTA - Optimizados paddings para móvil -->
+            <div class="lg:col-span-8 flex flex-col md:flex-row items-center justify-center bg-gradient-to-br from-neutral-900/40 to-black p-2 sm:p-4 lg:p-12 rounded-[2.5rem] lg:rounded-[4rem] border border-neutral-800/30 shadow-2xl relative overflow-hidden group">
                 <div id="ambient-glow" class="absolute inset-0 transition-all duration-700 pointer-events-none"></div>
                 <div class="absolute top-0 right-0 w-64 h-64 theme-glow-bg rounded-full blur-[120px] pointer-events-none opacity-20"></div>
                 
-                <div id="disk-wrapper" class="relative w-full max-w-[95vw] sm:max-w-[600px] lg:max-w-[900px] aspect-square flex items-center justify-center mx-auto transition-all duration-300">
+                <div id="disk-wrapper" class="relative w-full max-w-[98vw] sm:max-w-[600px] lg:max-w-[900px] aspect-square flex items-center justify-center mx-auto transition-all duration-300">
                     <div id="disk-glow" class="absolute w-[94%] h-[94%] rounded-full transition-all duration-500 pointer-events-none z-0"></div>
                     <canvas id="mainDisk" width="1600" height="1600" class="w-full h-full relative z-10 cursor-grab active:cursor-grabbing"></canvas>
                 </div>
 
-                <div class="flex flex-col items-center justify-center md:border-l border-neutral-800/20 md:pl-12 mt-8 md:mt-0 min-w-[240px] w-full md:w-auto">
+                <div class="flex flex-col items-center justify-center md:border-l border-neutral-800/20 md:pl-12 mt-6 md:mt-0 min-w-[240px] w-full md:w-auto">
                     <div class="relative flex flex-col items-center">
                         <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-amber-500/10 rounded-full blur-[100px] animate-pulse"></div>
                         <div class="relative flex flex-col items-center">
-                            <span class="text-[12px] sm:text-[13px] font-black uppercase tracking-[0.5em] text-neutral-400 mb-2 transition-colors">Desplazamiento</span>
-                            <div id="shift-value" class="text-6xl sm:text-7xl md:text-9xl font-black theme-accent tabular-nums glow-text transition-colors duration-500 leading-none select-none tracking-tighter">03</div>
+                            <span class="text-[11px] sm:text-[13px] font-black uppercase tracking-[0.5em] text-neutral-400 mb-2 transition-colors">Desplazamiento</span>
+                            <div id="shift-value" class="text-5xl sm:text-7xl md:text-9xl font-black theme-accent tabular-nums glow-text transition-colors duration-500 leading-none select-none tracking-tighter">03</div>
                             <div class="w-20 h-1 theme-bg opacity-30 rounded-full mt-4 mb-4 lg:mt-8 lg:mb-8"></div>
                             
                             <button id="disk-reset-btn" class="flex items-center gap-3 px-6 py-3 bg-neutral-900/80 text-neutral-500 rounded-2xl border border-neutral-800 transition-all active:scale-95 hover:text-white group/btn">
@@ -177,11 +177,11 @@
             </div>
 
             <div class="lg:col-span-4 flex flex-col gap-6">
-                <div class="bg-neutral-900/40 p-8 rounded-[3rem] lg:rounded-[4rem] border border-neutral-800/40 backdrop-blur-xl shadow-2xl h-full flex flex-col justify-between">
-                    <div class="space-y-8 flex-1">
+                <div class="bg-neutral-900/40 p-6 sm:p-8 rounded-[3rem] lg:rounded-[4rem] border border-neutral-800/40 backdrop-blur-xl shadow-2xl h-full flex flex-col justify-between">
+                    <div class="space-y-6 flex-1">
                         <div class="space-y-2">
                             <label class="text-[13px] font-black uppercase tracking-[0.4em] text-neutral-400 ml-2 transition-colors">Entrada de Texto</label>
-                            <textarea id="input-text" placeholder="Escribe aquí tu mensaje confidencial..." class="w-full h-32 bg-black/40 border border-neutral-800/60 rounded-[2.5rem] p-8 text-lg focus:theme-border-active transition-all outline-none resize-none placeholder:text-neutral-800 text-neutral-300 shadow-inner font-sans"></textarea>
+                            <textarea id="input-text" placeholder="Escribe aquí tu mensaje confidencial..." class="w-full h-28 bg-black/40 border border-neutral-800/60 rounded-[2.5rem] p-6 text-lg focus:theme-border-active transition-all outline-none resize-none placeholder:text-neutral-800 text-neutral-300 shadow-inner font-sans"></textarea>
                         </div>
 
                         <div class="space-y-4">
@@ -191,13 +191,13 @@
                                     Copiar
                                 </button>
                             </div>
-                            <div id="output-text" class="w-full min-h-[140px] theme-glow-bg border theme-border rounded-[2.5rem] p-8 font-mono text-2xl theme-accent break-all leading-relaxed shadow-inner transition-colors duration-500">
+                            <div id="output-text" class="w-full min-h-[120px] theme-glow-bg border theme-border rounded-[2.5rem] p-6 font-mono text-2xl theme-accent break-all leading-relaxed shadow-inner transition-colors duration-500">
                                 <span class="text-neutral-800 italic text-sm font-sans">El texto aparecerá aquí...</span>
                             </div>
                         </div>
                     </div>
 
-                    <button id="reset-btn" class="w-full mt-10 py-6 flex items-center justify-center gap-3 bg-neutral-900 border border-neutral-800/40 text-neutral-500 rounded-[2.5rem] font-bold transition-all text-[11px] tracking-[0.4em] uppercase active:scale-95">
+                    <button id="reset-btn" class="w-full mt-6 py-5 flex items-center justify-center gap-3 bg-neutral-900 border border-neutral-800/40 text-neutral-500 rounded-[2.5rem] font-bold transition-all text-[11px] tracking-[0.4em] uppercase active:scale-95">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
                         Reiniciar Todo
                     </button>
@@ -205,7 +205,7 @@
             </div>
         </main>
 
-        <footer class="py-12 text-center w-full opacity-60 border-t border-neutral-900 mt-10">
+        <footer class="py-10 text-center w-full opacity-60 border-t border-neutral-900 mt-10">
             <p class="text-neutral-500 text-[10px] font-bold uppercase tracking-[0.5em] transition-colors">
                 © Daniel Morisio // Visual Logic Research Lab // 2026
             </p>
