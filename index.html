@@ -144,7 +144,7 @@
 
                 <div class="flex flex-col items-center justify-center md:border-l border-neutral-800/20 md:pl-12 mt-8 md:mt-0 min-w-[240px]">
                     <div class="relative">
-                        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 theme-glow-bg rounded-full blur-[100px] animate-pulse"></div>
+                        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-amber-500/10 rounded-full blur-[100px] animate-pulse"></div>
                         <div class="relative flex flex-col items-center">
                             <span class="text-[13px] font-black uppercase tracking-[0.5em] text-neutral-400 mb-4 transition-colors">Desplazamiento</span>
                             <div id="shift-value" class="text-7xl md:text-9xl font-black theme-accent tabular-nums glow-text transition-colors duration-500 leading-none select-none tracking-tighter">03</div>
@@ -315,11 +315,11 @@
             const radius = Math.min(centerX, centerY) * 0.94;
             const angleStep = (Math.PI * 2) / total;
             const innerR = radius * 0.68;
-            const knobRadius = radius * 0.32;
+            const knobRadius = radius * 0.35;
             
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // 1. Disco Exterior
+            // 1. Disco Exterior (Revertido a estética plana V90)
             ctx.beginPath();
             ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
             let gradOuter = ctx.createRadialGradient(centerX, centerY, radius * 0.8, centerX, centerY, radius);
@@ -331,13 +331,17 @@
             ctx.lineWidth = 4;
             ctx.stroke();
 
-            // LÍNEAS SEPARADORAS EXTERIORES (Letras Grises - Desvanecimiento hacia AFUERA)
+            // LÍNEAS SEPARADORAS EXTERIORES
             ctx.save();
             let outerLinesGrad = ctx.createRadialGradient(centerX, centerY, innerR, centerX, centerY, radius);
-            outerLinesGrad.addColorStop(0, '#666');
+            outerLinesGrad.addColorStop(0, '#ccc');
+            outerLinesGrad.addColorStop(0.3, '#777'); 
             outerLinesGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+            
+            ctx.shadowColor = 'rgba(255, 255, 255, 0.4)';
+            ctx.shadowBlur = 10;
             ctx.strokeStyle = outerLinesGrad;
-            ctx.lineWidth = 2.0;
+            ctx.lineWidth = 2.2;
             for(let i = 0; i < total; i++) {
                 const angle = (i + 0.5) * angleStep - Math.PI / 2;
                 ctx.beginPath();
@@ -349,7 +353,7 @@
 
             const outerTextRadius = radius * 0.88;
             ctx.font = `bold ${radius * 0.135}px Inter`;
-            ctx.fillStyle = '#9aa'; 
+            ctx.fillStyle = '#9aa'; // Gris técnico coordinado
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ALPHABET.forEach((letter, i) => {
@@ -363,6 +367,7 @@
                 ctx.restore();
             });
 
+            // Marcador triangular superior (V90)
             ctx.save();
             ctx.translate(centerX, centerY - radius - 15);
             ctx.beginPath();
@@ -380,10 +385,10 @@
             ctx.save();
             ctx.beginPath();
             ctx.arc(centerX, centerY - markerR, radius * 0.052, 0, Math.PI * 2);
-            ctx.strokeStyle = '#ffffff';
+            ctx.strokeStyle = '#9aa'; 
             ctx.lineWidth = 2;
             ctx.stroke();
-            ctx.shadowColor = '#ffffff';
+            ctx.shadowColor = 'rgba(153, 170, 170, 0.5)';
             ctx.shadowBlur = 10;
             ctx.stroke();
             ctx.restore();
@@ -410,15 +415,16 @@
             ctx.lineWidth = 6;
             ctx.stroke();
 
-            // LÍNEAS SEPARADORAS INTERIORES (Letras Ámbar - Desvanecimiento AFUERA HACIA ADENTRO)
+            // LÍNEAS SEPARADORAS INTERIORES
             ctx.save();
-            // Invertimos el gradiente: opaco en innerR, transparente en knobRadius
             let innerLinesGrad = ctx.createRadialGradient(centerX, centerY, knobRadius, centerX, centerY, innerR);
-            innerLinesGrad.addColorStop(0, 'rgba(0, 0, 0, 0)'); // Transparente en la perilla
-            innerLinesGrad.addColorStop(1, `rgba(${state.themeRGB}, 0.5)`); // Opaco en el borde exterior del disco móvil
+            innerLinesGrad.addColorStop(0, 'rgba(0, 0, 0, 0)');
+            innerLinesGrad.addColorStop(1, `rgba(${state.themeRGB}, 0.9)`); 
             
+            ctx.shadowColor = `rgba(${state.themeRGB}, 0.5)`;
+            ctx.shadowBlur = 12;
             ctx.strokeStyle = innerLinesGrad;
-            ctx.lineWidth = 1.4;
+            ctx.lineWidth = 1.8;
             for(let i = 0; i < total; i++) {
                 const angle = (i + 0.5) * angleStep - Math.PI / 2;
                 ctx.beginPath();
@@ -426,6 +432,42 @@
                 ctx.lineTo(centerX + Math.cos(angle) * innerR, centerY + Math.sin(angle) * innerR);
                 ctx.stroke();
             }
+            ctx.restore();
+
+            // FLECHAS INDICADORAS DE GIRO (Gris traslúcido grueso)
+            ctx.save();
+            ctx.strokeStyle = 'rgba(160, 160, 160, 0.2)'; 
+            ctx.lineWidth = 14.0; 
+            ctx.lineCap = 'round';
+            const arrowRadius = knobRadius + 55;
+            const arrowSpan = 0.85; 
+
+            const drawIndicator = (centerAngle) => {
+                const start = centerAngle - arrowSpan/2;
+                const end = centerAngle + arrowSpan/2;
+                
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, arrowRadius, start, end);
+                ctx.stroke();
+
+                const pSize = 22;
+                // Punta 1
+                ctx.beginPath();
+                ctx.moveTo(centerX + Math.cos(end - 0.1) * (arrowRadius - pSize), centerY + Math.sin(end - 0.1) * (arrowRadius - pSize));
+                ctx.lineTo(centerX + Math.cos(end) * arrowRadius, centerY + Math.sin(end) * arrowRadius);
+                ctx.lineTo(centerX + Math.cos(end - 0.1) * (arrowRadius + pSize), centerY + Math.sin(end - 0.1) * (arrowRadius + pSize));
+                ctx.stroke();
+
+                // Punta 2
+                ctx.beginPath();
+                ctx.moveTo(centerX + Math.cos(start + 0.1) * (arrowRadius - pSize), centerY + Math.sin(start + 0.1) * (arrowRadius - pSize));
+                ctx.lineTo(centerX + Math.cos(start) * arrowRadius, centerY + Math.sin(start) * arrowRadius);
+                ctx.lineTo(centerX + Math.cos(start + 0.1) * (arrowRadius + pSize), centerY + Math.sin(start + 0.1) * (arrowRadius + pSize));
+                ctx.stroke();
+            };
+
+            drawIndicator(0);       // Derecha
+            drawIndicator(Math.PI);  // Izquierda
             ctx.restore();
 
             // Índices Numéricos
@@ -456,98 +498,63 @@
                 ctx.restore();
             });
 
-            // 3. Perilla Central Cilíndrica 3D
-            const numTeeth = 32;
-            const toothHeight = 8;
-            const toothWidth = (Math.PI * 2) / (numTeeth * 2);
-
-            ctx.save();
+            // 3. PERILLA CENTRAL
             ctx.beginPath();
-            for(let i = 0; i < numTeeth * 2; i++) {
-                const angle = i * toothWidth;
-                const r = (i % 2 === 0) ? knobRadius + 18 : knobRadius + 18 - toothHeight;
-                ctx.lineTo(centerX + Math.cos(angle) * r, centerY + Math.sin(angle) * r);
-            }
-            ctx.closePath();
-            ctx.fillStyle = 'rgba(0,0,0,0.75)';
-            ctx.fill();
-            ctx.restore();
-
-            ctx.beginPath();
-            for(let i = 0; i < numTeeth * 2; i++) {
-                const angle = i * toothWidth;
-                const r = (i % 2 === 0) ? knobRadius : knobRadius - toothHeight;
-                ctx.lineTo(centerX + Math.cos(angle) * r, centerY + Math.sin(angle) * r);
-            }
-            ctx.closePath();
-            let cylinderGrad = ctx.createLinearGradient(centerX - knobRadius, centerY, centerX + knobRadius, centerY);
-            cylinderGrad.addColorStop(0, '#050505');
-            cylinderGrad.addColorStop(0.5, '#1a1a1a');
-            cylinderGrad.addColorStop(1, '#050505');
-            ctx.fillStyle = cylinderGrad;
-            ctx.fill();
-            ctx.strokeStyle = '#222';
-            ctx.lineWidth = 1;
-            ctx.stroke();
-
-            const topRadius = knobRadius * 0.82;
-            ctx.beginPath();
-            ctx.arc(centerX, centerY, topRadius + 2, 0, Math.PI * 2);
-            ctx.fillStyle = 'rgba(0,0,0,0.8)';
+            ctx.arc(centerX, centerY, knobRadius + 12, 0, Math.PI * 2);
+            let housingGrad = ctx.createRadialGradient(centerX, centerY, knobRadius, centerX, centerY, knobRadius + 12);
+            housingGrad.addColorStop(0, '#000');
+            housingGrad.addColorStop(1, '#222');
+            ctx.fillStyle = housingGrad;
             ctx.fill();
 
             ctx.beginPath();
-            ctx.arc(centerX, centerY, topRadius, 0, Math.PI * 2);
-            let brushedGrad = ctx.createRadialGradient(centerX - 10, centerY - 10, 0, centerX, centerY, topRadius);
-            brushedGrad.addColorStop(0, '#3a3a3a');
-            brushedGrad.addColorStop(0.6, '#111111');
-            brushedGrad.addColorStop(1, '#080808');
-            ctx.fillStyle = brushedGrad;
+            ctx.arc(centerX, centerY, knobRadius, 0, Math.PI * 2);
+            let knobSurfaceGrad = ctx.createRadialGradient(centerX - knobRadius*0.2, centerY - knobRadius*0.2, 0, centerX, centerY, knobRadius);
+            knobSurfaceGrad.addColorStop(0, '#2a2a2a');
+            knobSurfaceGrad.addColorStop(0.7, '#151515');
+            knobSurfaceGrad.addColorStop(1, '#0a0a0a');
+            ctx.fillStyle = knobSurfaceGrad;
+            ctx.shadowColor = 'rgba(0,0,0,0.9)';
+            ctx.shadowBlur = 30;
             ctx.fill();
-
-            ctx.save();
-            ctx.globalCompositeOperation = 'overlay';
-            let shineGrad = ctx.createLinearGradient(centerX - topRadius, centerY - topRadius, centerX + topRadius, centerY + topRadius);
-            shineGrad.addColorStop(0, 'rgba(255,255,255,0.2)');
-            shineGrad.addColorStop(0.5, 'rgba(0,0,0,0)');
-            shineGrad.addColorStop(1, 'rgba(255,255,255,0.2)');
-            ctx.fillStyle = shineGrad;
-            ctx.beginPath();
-            ctx.arc(centerX, centerY, topRadius, 0, Math.PI*2);
-            ctx.fill();
-            ctx.restore();
-
-            ctx.beginPath();
-            ctx.arc(centerX, centerY, topRadius, 0, Math.PI * 2);
-            ctx.strokeStyle = '#444';
-            ctx.lineWidth = 1.5;
-            ctx.stroke();
-
-            ctx.beginPath();
-            ctx.moveTo(centerX, centerY - (topRadius * 0.45));
-            ctx.lineTo(centerX, centerY - (topRadius * 0.88));
-            ctx.strokeStyle = '#ffffff';
-            ctx.lineWidth = 2.5; 
-            ctx.lineCap = 'round';
-            ctx.shadowColor = 'rgba(255,255,255,0.5)';
-            ctx.shadowBlur = 4;
-            ctx.stroke();
             ctx.shadowBlur = 0;
-            
+
             ctx.beginPath();
-            ctx.arc(centerX, centerY, 8, 0, Math.PI * 2);
-            let ledGrad = ctx.createRadialGradient(centerX - 2, centerY - 2, 0, centerX, centerY, 8);
-            ledGrad.addColorStop(0, '#fff');
-            ledGrad.addColorStop(0.2, state.themeColor);
-            ledGrad.addColorStop(1, '#000');
-            ctx.fillStyle = ledGrad;
-            ctx.shadowColor = state.themeColor;
-            ctx.shadowBlur = 20;
+            ctx.arc(centerX, centerY, knobRadius - 2, 0, Math.PI * 2);
+            ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            // PUNTO GRIS DE LA PERILLA
+            const ledRadius = 10;
+            const ledDistance = knobRadius * 0.78;
+            const ledAngle = -Math.PI / 2;
+            const lx = centerX + Math.cos(ledAngle) * ledDistance;
+            const ly = centerY + Math.sin(ledAngle) * ledDistance;
+
+            ctx.beginPath();
+            ctx.arc(lx, ly, ledRadius + 2, 0, Math.PI * 2);
+            let ledRim = ctx.createLinearGradient(lx - 5, ly - 5, lx + 5, ly + 5);
+            ledRim.addColorStop(0, '#444');
+            ledRim.addColorStop(1, '#111');
+            ctx.fillStyle = ledRim;
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.arc(lx, ly, ledRadius, 0, Math.PI * 2);
+            let ledLight = ctx.createRadialGradient(lx - 2, ly - 2, 0, lx, ly, ledRadius);
+            ledLight.addColorStop(0, '#fff');
+            ledLight.addColorStop(0.3, '#888'); // Gris neutro técnico
+            ledLight.addColorStop(1, '#000');
+            ctx.fillStyle = ledLight;
+            ctx.shadowColor = 'rgba(160, 160, 160, 0.4)'; 
+            ctx.shadowBlur = 15;
             ctx.fill();
             ctx.shadowBlur = 0;
 
             ctx.restore(); 
 
+            // FLECHA INDICADORA CENTRAL GRIS (Sincronizada con aro exterior)
             ctx.save();
             ctx.translate(centerX, centerY - (innerR * 0.65)); 
             ctx.beginPath();
@@ -555,8 +562,8 @@
             ctx.lineTo(-20, 5);
             ctx.lineTo(20, 5);
             ctx.closePath();
-            ctx.fillStyle = '#ffffff'; 
-            ctx.shadowColor = 'rgba(255, 255, 255, 0.9)';
+            ctx.fillStyle = '#9aa'; 
+            ctx.shadowColor = 'rgba(153, 170, 170, 0.6)';
             ctx.shadowBlur = 12;
             ctx.fill();
             ctx.restore();
