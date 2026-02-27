@@ -20,7 +20,7 @@
             color: #e5e5e5;
             font-family: 'Inter', sans-serif;
             overflow-x: hidden;
-            /* touch-action: none; ELIMINADO para permitir el scroll nativo en móviles */
+            /* touch-action: none; -> Eliminado para permitir el scroll en móviles */
         }
 
         .font-mono {
@@ -56,7 +56,7 @@
             -webkit-user-drag: none;
         }
 
-        /* Bloqueamos el scroll solo en el canvas para una rotación táctil fluida */
+        /* Bloqueamos el scroll solo en el canvas para rotación táctil precisa */
         #mainDisk {
             touch-action: none;
         }
@@ -163,7 +163,7 @@
                         <div class="relative flex flex-col items-center">
                             <span class="text-[13px] font-black uppercase tracking-[0.5em] text-neutral-400 mb-4 transition-colors">Desplazamiento</span>
                             <div id="shift-value" class="text-7xl md:text-9xl font-black theme-accent tabular-nums glow-text transition-colors duration-500 leading-none select-none tracking-tighter">03</div>
-                            <div class="w-24 h-1 theme-bg opacity-30 rounded-full mt-6 mb-8 lg:mt-8 lg:mb-8"></div>
+                            <div class="w-24 h-1 theme-bg opacity-30 rounded-full mt-8 mb-8"></div>
                             
                             <button id="disk-reset-btn" class="disk-action-btn flex items-center gap-3 px-6 py-3 bg-neutral-900/80 text-neutral-500 rounded-2xl border border-neutral-800 transition-all active:scale-95 group/btn" title="Reiniciar Disco">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="transition-transform duration-500"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
@@ -195,16 +195,16 @@
                         </div>
                     </div>
 
-                    <button id="reset-btn" class="w-full mt-10 py-6 flex items-center justify-center gap-3 bg-neutral-900 border border-neutral-800/40 text-neutral-500 rounded-[2.5rem] font-bold transition-all text-[11px] tracking-[0.4em] uppercase active:scale-95 hover:text-red-500 transition-colors">
+                    <button id="reset-btn" class="w-full mt-10 py-6 flex items-center justify-center gap-3 bg-neutral-900 border border-neutral-800/40 text-neutral-500 rounded-[2.5rem] font-bold transition-all text-[11px] tracking-[0.4em] uppercase active:scale-95">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
-                        Reiniciar Todo el Sistema
+                        Reiniciar Todo
                     </button>
                 </div>
             </div>
         </main>
 
         <footer class="py-12 text-center w-full opacity-60 border-t border-neutral-900 mt-10">
-            <p class="text-neutral-400 text-[10px] font-bold uppercase tracking-[0.5em] transition-colors">
+            <p class="text-neutral-500 text-[10px] font-bold uppercase tracking-[0.5em] transition-colors">
                 © Daniel Morisio // Visual Logic Research Lab // 2026
             </p>
         </footer>
@@ -243,11 +243,23 @@
             gain1.gain.setValueAtTime(0.18, now);
             gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
             
+            const osc2 = audioCtx.createOscillator();
+            const gain2 = audioCtx.createGain();
+            osc2.type = 'sine';
+            osc2.frequency.setValueAtTime(2200, now);
+            osc2.frequency.exponentialRampToValueAtTime(1800, now + 0.03);
+            gain2.gain.setValueAtTime(0.06, now);
+            gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.03);
+
             osc1.connect(gain1);
             gain1.connect(audioCtx.destination);
+            osc2.connect(gain2);
+            gain2.connect(audioCtx.destination);
             
             osc1.start(now);
             osc1.stop(now + 0.08);
+            osc2.start(now);
+            osc2.stop(now + 0.03);
         }
 
         const canvas = document.getElementById('mainDisk');
@@ -286,10 +298,12 @@
                 audioStatusDot.classList.replace('theme-bg', 'bg-neutral-800');
                 audioStatusDot.style.boxShadow = 'none';
                 audioStatusLabel.textContent = 'OFF';
+                audioStatusLabel.classList.replace('text-neutral-500', 'text-red-500');
             } else {
                 audioStatusDot.classList.replace('bg-neutral-800', 'theme-bg');
                 audioStatusDot.style.boxShadow = `0 0 8px var(--theme-color)`;
                 audioStatusLabel.textContent = 'ON';
+                audioStatusLabel.classList.replace('text-red-500', 'text-neutral-500');
                 playTick();
             }
         });
@@ -321,7 +335,7 @@
             const centerY = canvas.height / 2;
             const radius = Math.min(centerX, centerY) * 0.94;
             const angleStep = (Math.PI * 2) / total;
-            const innerR = radius * 0.70;
+            const innerR = radius * 0.68;
             const knobRadius = radius * 0.35;
             
             ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -338,10 +352,17 @@
             ctx.lineWidth = 4;
             ctx.stroke();
 
-            // Separadores fijos
+            // LÍNEAS SEPARADORAS EXTERIORES
             ctx.save();
-            ctx.strokeStyle = 'rgba(100, 100, 100, 0.2)';
-            ctx.lineWidth = 2;
+            let outerLinesGrad = ctx.createRadialGradient(centerX, centerY, innerR, centerX, centerY, radius);
+            outerLinesGrad.addColorStop(0, '#ccc');
+            outerLinesGrad.addColorStop(0.3, '#777'); 
+            outerLinesGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+            
+            ctx.shadowColor = 'rgba(255, 255, 255, 0.4)';
+            ctx.shadowBlur = 10;
+            ctx.strokeStyle = outerLinesGrad;
+            ctx.lineWidth = 2.2;
             for(let i = 0; i < total; i++) {
                 const angle = (i + 0.5) * angleStep - Math.PI / 2;
                 ctx.beginPath();
@@ -367,12 +388,40 @@
                 ctx.restore();
             });
 
+            ctx.save();
+            ctx.translate(centerX, centerY - radius - 15);
+            ctx.beginPath();
+            ctx.moveTo(0, 35); 
+            ctx.lineTo(-22, 0);
+            ctx.lineTo(22, 0);
+            ctx.closePath();
+            ctx.fillStyle = state.themeColor;
+            ctx.shadowColor = `rgba(${state.themeRGB}, 0.8)`;
+            ctx.shadowBlur = 20;
+            ctx.fill();
+            ctx.restore();
+
+            const markerR = radius * 0.76;
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(centerX, centerY - markerR, radius * 0.052, 0, Math.PI * 2);
+            ctx.strokeStyle = '#9aa'; 
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            ctx.shadowColor = 'rgba(153, 170, 170, 0.5)';
+            ctx.shadowBlur = 10;
+            ctx.stroke();
+            ctx.restore();
+
             // 2. Disco Interno
             ctx.save();
             ctx.translate(centerX, centerY);
             ctx.rotate(state.rotation * Math.PI / 180);
             ctx.translate(-centerX, -centerY);
 
+            ctx.shadowColor = 'rgba(0,0,0,0.8)';
+            ctx.shadowBlur = 50;
+            ctx.shadowOffsetY = 20;
             ctx.beginPath();
             ctx.arc(centerX, centerY, innerR, 0, Math.PI * 2);
             let gradInner = ctx.createRadialGradient(centerX, centerY, innerR * 0.6, centerX, centerY, innerR);
@@ -380,12 +429,76 @@
             gradInner.addColorStop(1, '#111');
             ctx.fillStyle = gradInner;
             ctx.fill();
+            ctx.shadowColor = 'transparent';
             ctx.strokeStyle = state.themeColor;
             ctx.lineWidth = 6;
             ctx.stroke();
 
-            // Letras Internas
-            ctx.font = `bold ${radius * 0.095}px Inter`;
+            // LÍNEAS SEPARADORAS INTERIORES
+            ctx.save();
+            let innerLinesGrad = ctx.createRadialGradient(centerX, centerY, knobRadius, centerX, centerY, innerR);
+            innerLinesGrad.addColorStop(0, 'rgba(0, 0, 0, 0)');
+            innerLinesGrad.addColorStop(1, `rgba(${state.themeRGB}, 0.9)`); 
+            
+            ctx.shadowColor = `rgba(${state.themeRGB}, 0.5)`;
+            ctx.shadowBlur = 12;
+            ctx.strokeStyle = innerLinesGrad;
+            ctx.lineWidth = 1.8;
+            for(let i = 0; i < total; i++) {
+                const angle = (i + 0.5) * angleStep - Math.PI / 2;
+                ctx.beginPath();
+                ctx.moveTo(centerX + Math.cos(angle) * knobRadius, centerY + Math.sin(angle) * knobRadius);
+                ctx.lineTo(centerX + Math.cos(angle) * innerR, centerY + Math.sin(angle) * innerR);
+                ctx.stroke();
+            }
+            ctx.restore();
+
+            // FLECHAS INDICADORAS
+            ctx.save();
+            ctx.strokeStyle = 'rgba(160, 160, 160, 0.2)'; 
+            ctx.lineWidth = 14.0; 
+            ctx.lineCap = 'round';
+            const arrowRadius = knobRadius + 55;
+            const arrowSpan = 0.85; 
+
+            const drawIndicator = (centerAngle) => {
+                const start = centerAngle - arrowSpan/2;
+                const end = centerAngle + arrowSpan/2;
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, arrowRadius, start, end);
+                ctx.stroke();
+                const pSize = 22;
+                ctx.beginPath();
+                ctx.moveTo(centerX + Math.cos(end - 0.1) * (arrowRadius - pSize), centerY + Math.sin(end - 0.1) * (arrowRadius - pSize));
+                ctx.lineTo(centerX + Math.cos(end) * arrowRadius, centerY + Math.sin(end) * arrowRadius);
+                ctx.lineTo(centerX + Math.cos(end - 0.1) * (arrowRadius + pSize), centerY + Math.sin(end - 0.1) * (arrowRadius + pSize));
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(centerX + Math.cos(start + 0.1) * (arrowRadius - pSize), centerY + Math.sin(start + 0.1) * (arrowRadius - pSize));
+                ctx.lineTo(centerX + Math.cos(start) * arrowRadius, centerY + Math.sin(start) * arrowRadius);
+                ctx.lineTo(centerX + Math.cos(start + 0.1) * (arrowRadius + pSize), centerY + Math.sin(start + 0.1) * (arrowRadius + pSize));
+                ctx.stroke();
+            };
+            drawIndicator(0);
+            drawIndicator(Math.PI);
+            ctx.restore();
+
+            // Índices Numéricos
+            ctx.font = `500 ${radius * 0.054}px "JetBrains Mono"`;
+            ctx.fillStyle = `rgba(${state.themeRGB}, 0.85)`;
+            ALPHABET.forEach((_, i) => {
+                const angle = i * angleStep - Math.PI / 2; 
+                const txNum = centerX + Math.cos(angle) * (radius * 0.76);
+                const tyNum = centerY + Math.sin(angle) * (radius * 0.76);
+                ctx.save();
+                ctx.translate(txNum, tyNum);
+                ctx.rotate(angle + Math.PI/2);
+                ctx.fillText(i, 0, 0);
+                ctx.restore();
+            });
+
+            // Letras Ambar Internas
+            ctx.font = `500 ${radius * 0.095}px Inter`;
             ctx.fillStyle = state.themeColor;
             ALPHABET.forEach((letter, i) => {
                 const angle = i * angleStep - Math.PI / 2;
@@ -398,31 +511,57 @@
                 ctx.restore();
             });
 
-            // Centro
+            // Perilla Central
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, knobRadius + 12, 0, Math.PI * 2);
+            let housingGrad = ctx.createRadialGradient(centerX, centerY, knobRadius, centerX, centerY, knobRadius + 12);
+            housingGrad.addColorStop(0, '#000');
+            housingGrad.addColorStop(1, '#222');
+            ctx.fillStyle = housingGrad;
+            ctx.fill();
+
             ctx.beginPath();
             ctx.arc(centerX, centerY, knobRadius, 0, Math.PI * 2);
-            ctx.fillStyle = '#0a0a0a';
+            let knobSurfaceGrad = ctx.createRadialGradient(centerX - knobRadius*0.2, centerY - knobRadius*0.2, 0, centerX, centerY, knobRadius);
+            knobSurfaceGrad.addColorStop(0, '#2a2a2a');
+            knobSurfaceGrad.addColorStop(0.7, '#151515');
+            knobSurfaceGrad.addColorStop(1, '#0a0a0a');
+            ctx.fillStyle = knobSurfaceGrad;
+            ctx.shadowColor = 'rgba(0,0,0,0.9)';
+            ctx.shadowBlur = 30;
             ctx.fill();
-            ctx.strokeStyle = '#333';
-            ctx.lineWidth = 2;
-            ctx.stroke();
-            
+            ctx.shadowBlur = 0;
+
+            const ledRadius = 10;
+            const ledDistance = knobRadius * 0.78;
+            const ledAngle = -Math.PI / 2;
+            const lx = centerX + Math.cos(ledAngle) * ledDistance;
+            const ly = centerY + Math.sin(ledAngle) * ledDistance;
+
             ctx.beginPath();
-            ctx.arc(centerX, centerY, 10, 0, Math.PI * 2);
-            ctx.fillStyle = state.themeColor;
+            ctx.arc(lx, ly, ledRadius, 0, Math.PI * 2);
+            let ledLight = ctx.createRadialGradient(lx - 2, ly - 2, 0, lx, ly, ledRadius);
+            ledLight.addColorStop(0, '#fff');
+            ledLight.addColorStop(0.3, '#888'); 
+            ledLight.addColorStop(1, '#000');
+            ctx.fillStyle = ledLight;
+            ctx.shadowColor = 'rgba(160, 160, 160, 0.4)'; 
+            ctx.shadowBlur = 15;
             ctx.fill();
+            ctx.shadowBlur = 0;
 
             ctx.restore(); 
 
-            // Puntero Fijo Superior
             ctx.save();
-            ctx.translate(centerX, centerY - (innerR * 0.62)); 
+            ctx.translate(centerX, centerY - (innerR * 0.65)); 
             ctx.beginPath();
             ctx.moveTo(0, -32); 
-            ctx.lineTo(-18, 5);
-            ctx.lineTo(18, 5);
+            ctx.lineTo(-22, 5);
+            ctx.lineTo(22, 5);
             ctx.closePath();
             ctx.fillStyle = '#9aa'; 
+            ctx.shadowColor = 'rgba(153, 170, 170, 0.6)';
+            ctx.shadowBlur = 12;
             ctx.fill();
             ctx.restore();
         }
@@ -445,7 +584,6 @@
                 pCtx.beginPath(); pCtx.arc(cx, cy, 6, 0, Math.PI * 2); pCtx.fill();
             };
 
-            // Disco Base
             const oCX = tempCanvas.width / 2; const oCY = 1000; const oR = 760; 
             pCtx.beginPath(); pCtx.arc(oCX, oCY, oR, 0, Math.PI * 2); pCtx.lineWidth = 5; pCtx.stroke();
             pCtx.font = 'bold 70px Inter';
@@ -456,7 +594,6 @@
             });
             drawCentralHub(oCX, oCY);
 
-            // Disco Móvil
             const iCX = tempCanvas.width / 2; const iCY = 2550; const iR = 560; 
             pCtx.beginPath(); pCtx.arc(iCX, iCY, iR, 0, Math.PI * 2); pCtx.stroke();
             ALPHABET.forEach((letter, i) => {
@@ -464,7 +601,7 @@
                 const tx = iCX + Math.cos(angle) * (iR - 80); const ty = iCY + Math.sin(angle) * (iR - 80);
                 pCtx.save(); pCtx.translate(tx, ty); pCtx.rotate(angle + Math.PI/2); pCtx.font = 'bold 55px Inter'; pCtx.fillText(letter, 0, 0); pCtx.restore();
             });
-            drawHub(iCX, iCY);
+            drawCentralHub(iCX, iCY);
 
             const { jsPDF } = window.jspdf; const pdf = new jsPDF('p', 'mm', 'a4');
             pdf.addImage(tempCanvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, 210, 297);
@@ -480,10 +617,8 @@
 
         function encrypt(text, s) {
             return text.toUpperCase().split("").map(char => {
-                const idx = ALPHABET.indexOf(char);
-                if (idx === -1) return char;
-                let newIdx = (idx + s) % total;
-                if (newIdx < 0) newIdx += total;
+                const idx = ALPHABET.indexOf(char); if (idx === -1) return char;
+                let newIdx = (idx + s) % total; if (newIdx < 0) newIdx += total;
                 return ALPHABET[newIdx];
             }).join("");
         }
@@ -492,15 +627,11 @@
             const res = encrypt(state.message, state.shift);
             outputEl.innerHTML = res ? res : '<span class="text-neutral-800 italic text-sm font-sans">El texto aparecerá aquí...</span>';
             shiftDisplay.textContent = state.shift.toString().padStart(2, '0');
-            if (state.shift !== state.lastShift) {
-                playTick();
-                state.lastShift = state.shift;
-            }
+            if (state.shift !== state.lastShift) { playTick(); state.lastShift = state.shift; }
             if (state.isDragging) {
-                diskGlow.style.boxShadow = `0 0 50px 15px rgba(${state.themeRGB}, 0.25)`;
-            } else {
-                diskGlow.style.boxShadow = 'none';
-            }
+                diskGlow.style.boxShadow = `0 0 50px 15px rgba(${state.themeRGB}, 0.2)`;
+                ambientGlow.style.backgroundColor = `rgba(${state.themeRGB}, 0.01)`;
+            } else { diskGlow.style.boxShadow = 'none'; ambientGlow.style.backgroundColor = 'transparent'; }
             draw();
         }
 
@@ -539,43 +670,23 @@
         window.addEventListener('touchmove', handleMove, {passive: false});
         window.addEventListener('touchend', handleEnd);
 
-        inputEl.addEventListener('input', (e) => {
-            state.message = e.target.value;
-            update();
-        });
-
-        diskResetBtn.addEventListener('click', () => {
-            state.shift = 0;
-            state.rotation = 0;
-            update();
-        });
-
-        resetBtn.addEventListener('click', () => {
-            state.message = '';
-            state.shift = 0;
-            state.rotation = 0;
-            inputEl.value = '';
-            update();
-        });
+        inputEl.addEventListener('input', (e) => { state.message = e.target.value; update(); });
+        diskResetBtn.addEventListener('click', () => { state.shift = 0; state.rotation = 0; update(); playTick(); });
+        resetBtn.addEventListener('click', () => { state.message = ''; state.shift = 0; state.rotation = 0; inputEl.value = ''; update(); });
 
         copyBtn.addEventListener('click', () => {
             const text = outputEl.innerText;
             if (text && !text.includes("El texto aparecerá aquí")) {
                 const tempTextArea = document.createElement("textarea");
-                tempTextArea.value = text;
-                document.body.appendChild(tempTextArea);
-                tempTextArea.select();
-                document.execCommand("copy");
+                tempTextArea.value = text; document.body.appendChild(tempTextArea);
+                tempTextArea.select(); document.execCommand("copy");
                 document.body.removeChild(tempTextArea);
-                const originalText = copyBtn.innerText;
-                copyBtn.innerText = "¡OK!";
-                setTimeout(() => copyBtn.innerText = originalText, 1000);
+                copyBtn.innerText = "¡OK!"; setTimeout(() => copyBtn.innerText = "Copiar", 1000);
             }
         });
 
         window.addEventListener('resize', draw);
-        draw();
-        update();
+        draw(); update();
     </script>
 </body>
 </html>
