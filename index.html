@@ -720,9 +720,25 @@
         }
 
         const handleStart = (e) => {
-            state.isDragging = true;
-            const cX = e.touches ? e.touches[0].clientX : e.clientX; const cY = e.touches ? e.touches[0].clientY : e.clientY;
-            state.startAngle = getAngle(cX, cY) - state.rotation; canvas.style.cursor = 'grabbing';
+            const rect = canvas.getBoundingClientRect();
+            const cX = e.touches ? e.touches[0].clientX : e.clientX; 
+            const cY = e.touches ? e.touches[0].clientY : e.clientY;
+            
+            // Calculamos la distancia desde el punto de contacto al centro del canvas
+            const dx = cX - (rect.left + rect.width / 2);
+            const dy = cY - (rect.top + rect.height / 2);
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            
+            // Radio del disco interno (ámbar) en píxeles reales de la pantalla
+            // 0.94 (radius factor) * 0.68 (innerR factor) * (ancho visual / 2)
+            const innerDiskLimit = (rect.width / 2) * 0.94 * 0.68;
+
+            // Solo iniciamos el arrastre si el contacto ocurre dentro del área del disco ámbar
+            if (dist <= innerDiskLimit) {
+                state.isDragging = true;
+                state.startAngle = getAngle(cX, cY) - state.rotation; 
+                canvas.style.cursor = 'grabbing';
+            }
         };
 
         const handleMove = (e) => {
