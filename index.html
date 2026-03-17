@@ -54,7 +54,8 @@
         #disk-wrapper {
             user-select: none;
             -webkit-user-drag: none;
-            transition: max-width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 100%; /* El ancho se controla por JS */
         }
 
         #mainDisk {
@@ -91,17 +92,6 @@
 
         .palette-btn:hover { transform: scale(1.15); border-color: rgba(255,255,255,0.3); }
         .palette-btn.active { border-color: white; box-shadow: 0 0 15px currentColor; }
-
-        /* Estilos para el cargador de IA */
-        .ai-loader {
-            width: 12px;
-            height: 12px;
-            border: 2px solid rgba(var(--theme-color-rgb), 0.3);
-            border-top-color: var(--theme-color);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body class="selection:bg-neutral-500/30">
@@ -158,26 +148,7 @@
                             <span id="zoom-label" class="text-[10px] font-mono font-bold text-neutral-400 tracking-tighter">100%</span>
                         </div>
                         <button id="zoom-in-btn" class="flex-1 py-2 bg-neutral-900 hover:bg-neutral-800 rounded-xl transition-all border border-neutral-700/30 flex justify-center items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                        </button>
-                    </div>
-
-                    <div class="h-px bg-neutral-800/60 mb-5"></div>
-
-                    <!-- NUEVA SECCIÓN: MÓDULO IA ✨ -->
-                    <div class="text-[8px] font-black uppercase tracking-widest text-neutral-600 mb-3 px-1">Módulo IA ✨</div>
-                    <div class="space-y-2 mb-6">
-                        <button id="ai-crack-btn" class="w-full flex items-center justify-between bg-black/60 p-3 rounded-xl border border-neutral-800/50 hover:theme-border-active transition-all group/ai">
-                            <div class="flex items-center gap-3">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="theme-accent"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
-                                <span class="text-[9px] font-bold uppercase tracking-widest text-neutral-400 group-hover/ai:text-neutral-200">✨ Descifrar con IA</span>
-                            </div>
-                        </button>
-                        <button id="ai-generate-btn" class="w-full flex items-center justify-between bg-black/60 p-3 rounded-xl border border-neutral-800/50 hover:theme-border-active transition-all group/ai">
-                            <div class="flex items-center gap-3">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="theme-accent"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                                <span class="text-[9px] font-bold uppercase tracking-widest text-neutral-400 group-hover/ai:text-neutral-200">✨ Sugerir Mensaje</span>
-                            </div>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                         </button>
                     </div>
 
@@ -205,16 +176,18 @@
 
         <main class="w-full max-w-[1850px] grid grid-cols-1 lg:grid-cols-12 gap-6 lg:flex-1 items-stretch">
             
-            <div class="lg:col-span-8 flex flex-col md:flex-row items-center justify-center bg-gradient-to-br from-neutral-900/40 to-black p-2 sm:p-4 lg:p-12 rounded-[2.5rem] lg:rounded-[4rem] border border-neutral-800/30 shadow-2xl relative overflow-hidden group">
+            <div class="lg:col-span-8 flex flex-col md:flex-row items-center justify-center bg-gradient-to-br from-neutral-900/40 to-black p-4 sm:p-6 lg:p-12 rounded-[2.5rem] lg:rounded-[4rem] border border-neutral-800/30 shadow-2xl relative overflow-hidden group">
                 <div id="ambient-glow" class="absolute inset-0 transition-all duration-700 pointer-events-none"></div>
                 <div class="absolute top-0 right-0 w-64 h-64 theme-glow-bg rounded-full blur-[120px] pointer-events-none opacity-20"></div>
                 
-                <div id="disk-wrapper" class="relative w-full max-w-[98vw] sm:max-w-[600px] lg:max-w-[900px] aspect-square flex items-center justify-center mx-auto transition-all duration-300">
-                    <div id="disk-glow" class="absolute w-[94%] h-[94%] rounded-full transition-all duration-500 pointer-events-none z-0"></div>
-                    <canvas id="mainDisk" width="1600" height="1600" class="w-full h-full relative z-10 cursor-grab active:cursor-grabbing"></canvas>
+                <div class="flex items-center justify-center w-full min-h-[300px]">
+                    <div id="disk-wrapper" class="relative aspect-square flex items-center justify-center mx-auto">
+                        <div id="disk-glow" class="absolute w-[94%] h-[94%] rounded-full transition-all duration-500 pointer-events-none z-0"></div>
+                        <canvas id="mainDisk" width="1600" height="1600" class="w-full h-full relative z-10 cursor-grab active:cursor-grabbing"></canvas>
+                    </div>
                 </div>
 
-                <div class="flex flex-col items-center justify-center md:border-l border-neutral-800/20 md:pl-12 mt-6 md:mt-0 min-w-[240px] w-full md:w-auto">
+                <div class="flex flex-col items-center justify-center md:border-l border-neutral-800/20 md:pl-12 mt-6 md:mt-0 min-w-[240px] w-full md:w-auto z-20">
                     <div class="relative flex flex-col items-center">
                         <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-amber-500/10 rounded-full blur-[100px] animate-pulse"></div>
                         <div class="relative flex flex-col items-center">
@@ -223,7 +196,7 @@
                             <div class="w-20 h-1 theme-bg opacity-30 rounded-full mt-4 mb-4 lg:mt-8 lg:mb-8"></div>
                             
                             <button id="disk-reset-btn" class="flex items-center gap-3 px-6 py-3 bg-neutral-900/80 text-neutral-500 rounded-2xl border border-neutral-800 transition-all active:scale-95 hover:text-white group/btn">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="transition-transform duration-500"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
                                 <span class="text-[10px] font-bold uppercase tracking-[0.2em]">Reset Disco</span>
                             </button>
                         </div>
@@ -248,12 +221,6 @@
                             </div>
                             <div id="output-text" class="w-full min-h-[120px] theme-glow-bg border theme-border rounded-[2.5rem] p-6 font-mono text-2xl theme-accent break-all leading-relaxed shadow-inner transition-colors duration-500 relative">
                                 <span id="output-placeholder" class="text-neutral-800 italic text-sm font-sans">El texto aparecerá aquí...</span>
-                                <div id="ai-status-overlay" class="hidden absolute inset-0 bg-black/60 backdrop-blur-sm rounded-[2.5rem] flex items-center justify-center z-10">
-                                    <div class="flex flex-col items-center gap-3">
-                                        <div class="ai-loader"></div>
-                                        <span class="text-[9px] font-bold uppercase tracking-widest text-neutral-400">Consultando IA...</span>
-                                    </div>
-                                </div>
                                 <span id="output-content"></span>
                             </div>
                         </div>
@@ -275,7 +242,6 @@
     </div>
 
     <script>
-        const apiKey = ""; // La clave se provee en el entorno de ejecución
         const ALPHABET = "ABCDEFGHIJKLMNÑOPQRSTUVWXYZ".split("");
         const total = ALPHABET.length;
         
@@ -305,32 +271,6 @@
             osc.start(now); osc.stop(now + 0.08);
         }
 
-        // --- FUNCIONES GEMINI API ---
-        async function callGemini(prompt, systemPrompt = "Eres un experto en criptografía y análisis de mensajes.") {
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
-            const payload = {
-                contents: [{ parts: [{ text: prompt }] }],
-                systemInstruction: { parts: [{ text: systemPrompt }] }
-            };
-
-            for (let i = 0; i < 5; i++) {
-                try {
-                    const response = await fetch(url, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-                    if (!response.ok) throw new Error('API Error');
-                    const result = await response.json();
-                    return result.candidates?.[0]?.content?.parts?.[0]?.text || "";
-                } catch (error) {
-                    const delay = Math.pow(2, i) * 1000;
-                    await new Promise(resolve => setTimeout(resolve, delay));
-                }
-            }
-            return "Error: No se pudo conectar con la IA.";
-        }
-
         const canvas = document.getElementById('mainDisk');
         const ctx = canvas.getContext('2d');
         const diskWrapper = document.getElementById('disk-wrapper');
@@ -338,7 +278,6 @@
         const inputEl = document.getElementById('input-text');
         const outputEl = document.getElementById('output-content');
         const outputPlaceholder = document.getElementById('output-placeholder');
-        const aiOverlay = document.getElementById('ai-status-overlay');
         const shiftDisplay = document.getElementById('shift-value');
         const resetBtn = document.getElementById('reset-btn');
         const diskResetBtn = document.getElementById('disk-reset-btn');
@@ -354,8 +293,6 @@
         const zoomInBtn = document.getElementById('zoom-in-btn');
         const zoomOutBtn = document.getElementById('zoom-out-btn');
         const zoomLabel = document.getElementById('zoom-label');
-        const aiCrackBtn = document.getElementById('ai-crack-btn');
-        const aiGenerateBtn = document.getElementById('ai-generate-btn');
 
         function toggleDropdown(e) {
             if (e) e.stopPropagation();
@@ -373,54 +310,27 @@
             }
         });
 
-        // Controles de Zoom
+        // Controles de Zoom Corregidos
         function updateZoom(delta) {
-            state.zoom = Math.max(50, Math.min(150, state.zoom + delta));
+            state.zoom = Math.max(50, Math.min(180, state.zoom + delta));
             zoomLabel.textContent = `${state.zoom}%`;
+            
+            // Calculamos el tamaño visual en base al viewport
             const isDesktop = window.innerWidth >= 1024;
-            const baseSize = isDesktop ? 900 : 600;
-            diskWrapper.style.maxWidth = `${(baseSize * state.zoom) / 100}px`;
+            const baseSize = isDesktop ? 800 : Math.min(window.innerWidth * 0.9, 500);
+            
+            // Aplicamos ancho directo al wrapper
+            const finalWidth = (baseSize * state.zoom) / 100;
+            diskWrapper.style.width = `${finalWidth}px`;
+            
             playTick();
         }
 
+        // Inicializar tamaño correcto en carga
+        window.addEventListener('load', () => updateZoom(0));
+
         zoomInBtn.addEventListener('click', (e) => { e.stopPropagation(); updateZoom(10); });
         zoomOutBtn.addEventListener('click', (e) => { e.stopPropagation(); updateZoom(-10); });
-
-        // --- LOGICA IA ✨ ---
-        aiCrackBtn.addEventListener('click', async (e) => {
-            e.stopPropagation();
-            const textToCrack = inputEl.value.trim();
-            if (!textToCrack) return;
-
-            aiOverlay.classList.remove('hidden');
-            const prompt = `Tengo este mensaje cifrado con el cifrado César (alfabeto español con Ñ): "${textToCrack}". Analiza el texto y dime cuál es el desplazamiento (shift) más probable del 0 al 26. Solo responde con el número de desplazamiento, sin explicaciones.`;
-            const result = await callGemini(prompt, "Eres un sistema de criptoanálisis.");
-            
-            aiOverlay.classList.add('hidden');
-            const detectedShift = parseInt(result.replace(/\D/g, ''));
-            
-            if (!isNaN(detectedShift) && detectedShift >= 0 && detectedShift <= 26) {
-                state.shift = detectedShift;
-                state.rotation = -(state.shift * (360 / total));
-                update();
-                playTick();
-            }
-        });
-
-        aiGenerateBtn.addEventListener('click', async (e) => {
-            e.stopPropagation();
-            aiOverlay.classList.remove('hidden');
-            const prompt = `Genera un mensaje corto y misterioso (estilo espía o conspiración) para cifrar. Máximo 15 palabras. Responde solo con el mensaje.`;
-            const result = await callGemini(prompt, "Eres un agente secreto de alto rango.");
-            
-            aiOverlay.classList.add('hidden');
-            if (result) {
-                inputEl.value = result.trim();
-                state.message = result.trim();
-                update();
-                playTick();
-            }
-        });
 
         audioToggleBtn.addEventListener('click', (e) => {
             e.stopPropagation(); state.isMuted = !state.isMuted;
@@ -547,8 +457,24 @@
                 ctx.save(); ctx.translate(tx, ty); ctx.rotate(angle + Math.PI/2); ctx.fillText(letter, 0, 0); ctx.restore();
             });
 
+            // Perilla Central
+            ctx.beginPath(); ctx.arc(centerX, centerY, knobRadius + 12, 0, Math.PI * 2);
+            let housingGrad = ctx.createRadialGradient(centerX, centerY, knobRadius, centerX, centerY, knobRadius + 12);
+            housingGrad.addColorStop(0, '#000'); housingGrad.addColorStop(1, '#222');
+            ctx.fillStyle = housingGrad; ctx.fill();
+
             ctx.beginPath(); ctx.arc(centerX, centerY, knobRadius, 0, Math.PI * 2);
-            ctx.fillStyle = '#0a0a0a'; ctx.fill();
+            let knobSurfaceGrad = ctx.createRadialGradient(centerX - knobRadius*0.2, centerY - knobRadius*0.2, 0, centerX, centerY, knobRadius);
+            knobSurfaceGrad.addColorStop(0, '#2a2a2a'); knobSurfaceGrad.addColorStop(0.7, '#151515'); knobSurfaceGrad.addColorStop(1, '#0a0a0a');
+            ctx.fillStyle = knobSurfaceGrad; ctx.fill();
+
+            // LED
+            const lx = centerX + Math.cos(-Math.PI/2) * (knobRadius * 0.78); const ly = centerY + Math.sin(-Math.PI/2) * (knobRadius * 0.78);
+            ctx.beginPath(); ctx.arc(lx, ly, 10, 0, Math.PI * 2);
+            let ledLight = ctx.createRadialGradient(lx - 2, ly - 2, 0, lx, ly, 10);
+            ledLight.addColorStop(0, '#fff'); ledLight.addColorStop(0.3, '#888'); ledLight.addColorStop(1, '#000');
+            ctx.fillStyle = ledLight; ctx.fill();
+
             ctx.restore(); 
 
             // Referencia central
@@ -640,6 +566,8 @@
             const cY = e.touches ? e.touches[0].clientY : e.clientY;
             const dx = cX - (rect.left + rect.width / 2); const dy = cY - (rect.top + rect.height / 2);
             const dist = Math.sqrt(dx * dx + dy * dy);
+            
+            // Límite del disco interior (ámbar) calculado sobre el rect visual actual
             const innerDiskLimit = (rect.width / 2) * 0.94 * 0.68;
 
             if (dist <= innerDiskLimit) {
@@ -677,7 +605,13 @@
                 copyBtn.innerText = "¡OK!"; setTimeout(() => copyBtn.innerText = "Copiar", 1000);
             }
         });
-        window.addEventListener('resize', draw); draw(); update();
+        window.addEventListener('resize', () => {
+            updateZoom(0);
+            draw();
+        });
+        
+        draw(); 
+        update();
     </script>
 </body>
 </html>
