@@ -55,9 +55,10 @@
             user-select: none;
             -webkit-user-drag: none;
             transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            width: 100%; /* El ancho se controla por JS */
+            width: 100%;
         }
 
+        /* touch-action: auto permite scroll sobre letras blancas */
         #mainDisk {
             touch-action: auto;
         }
@@ -148,7 +149,7 @@
                             <span id="zoom-label" class="text-[10px] font-mono font-bold text-neutral-400 tracking-tighter">100%</span>
                         </div>
                         <button id="zoom-in-btn" class="flex-1 py-2 bg-neutral-900 hover:bg-neutral-800 rounded-xl transition-all border border-neutral-700/30 flex justify-center items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                         </button>
                     </div>
 
@@ -205,30 +206,53 @@
             </div>
 
             <div class="lg:col-span-4 flex flex-col gap-6">
-                <div class="bg-neutral-900/40 p-6 sm:p-8 rounded-[3rem] lg:rounded-[4rem] border border-neutral-800/40 backdrop-blur-xl shadow-2xl h-full flex flex-col justify-between">
-                    <div class="space-y-6 flex-1">
-                        <div class="space-y-2">
-                            <label class="text-[13px] font-black uppercase tracking-[0.4em] text-neutral-400 ml-2 transition-colors">Entrada de Texto</label>
-                            <textarea id="input-text" placeholder="Escribe aquí tu mensaje confidencial..." class="w-full h-28 bg-black/40 border border-neutral-800/60 rounded-[2.5rem] p-6 text-lg focus:theme-border-active transition-all outline-none resize-none placeholder:text-neutral-800 text-neutral-300 shadow-inner font-sans"></textarea>
+                <div class="bg-neutral-900/40 p-6 sm:p-8 rounded-[3rem] lg:rounded-[4rem] border border-neutral-800/40 backdrop-blur-xl shadow-2xl h-full flex flex-col gap-6 overflow-y-auto">
+                    
+                    <!-- MÓDULO: CIFRADO -->
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-2 border-b border-neutral-800 pb-2">
+                            <span class="text-[9px] font-black uppercase tracking-[0.3em] text-neutral-600 italic">Cifrado Directo</span>
                         </div>
-
-                        <div class="space-y-4">
+                        <div class="space-y-2">
+                            <label class="text-[11px] font-black uppercase tracking-[0.4em] text-neutral-400 ml-2">Mensaje Original</label>
+                            <textarea id="input-text" placeholder="Escribe para cifrar..." class="w-full h-24 bg-black/40 border border-neutral-800/60 rounded-[1.5rem] p-5 text-base focus:theme-border-active transition-all outline-none resize-none text-neutral-300 shadow-inner"></textarea>
+                        </div>
+                        <div class="space-y-3">
                             <div class="flex justify-between items-center px-2">
-                                <label class="text-[13px] font-black uppercase tracking-[0.4em] text-neutral-400 transition-colors">Resultado Cifrado</label>
-                                <button id="copy-btn" class="px-6 py-2.5 theme-glow-bg hover:bg-white/5 rounded-2xl transition-all theme-accent text-[11px] font-bold uppercase tracking-widest theme-border active:scale-95 shadow-lg">
-                                    Copiar
-                                </button>
+                                <label class="text-[10px] font-black uppercase tracking-[0.4em] text-neutral-500 italic">Resultado</label>
+                                <button id="copy-btn" class="px-4 py-1.5 theme-glow-bg hover:bg-white/5 rounded-xl transition-all theme-accent text-[9px] font-bold uppercase tracking-widest theme-border active:scale-95 shadow-lg">Copiar</button>
                             </div>
-                            <div id="output-text" class="w-full min-h-[120px] theme-glow-bg border theme-border rounded-[2.5rem] p-6 font-mono text-2xl theme-accent break-all leading-relaxed shadow-inner transition-colors duration-500 relative">
-                                <span id="output-placeholder" class="text-neutral-800 italic text-sm font-sans">El texto aparecerá aquí...</span>
-                                <span id="output-content"></span>
+                            <div id="output-text" class="w-full min-h-[80px] theme-glow-bg border theme-border rounded-[1.5rem] p-5 font-mono text-xl theme-accent break-all leading-relaxed shadow-inner">
+                                <span id="output-placeholder-enc" class="text-neutral-800 italic text-xs font-sans">En espera de señal...</span>
+                                <span id="output-content-enc"></span>
                             </div>
                         </div>
                     </div>
 
-                    <button id="reset-btn" class="w-full mt-6 py-5 flex items-center justify-center gap-3 bg-neutral-900 border border-neutral-800/40 text-neutral-500 rounded-[2.5rem] font-bold transition-all text-[11px] tracking-[0.4em] uppercase active:scale-95">
+                    <!-- MÓDULO: DESCIFRADO (INVERSO) -->
+                    <div class="space-y-4 mt-2">
+                        <div class="flex items-center gap-2 border-b border-neutral-800 pb-2">
+                            <span class="text-[9px] font-black uppercase tracking-[0.3em] text-neutral-600 italic">Cifrado Inverso</span>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-[11px] font-black uppercase tracking-[0.4em] text-neutral-400 ml-2">Código Cifrado</label>
+                            <textarea id="input-code" placeholder="Pega un código aquí..." class="w-full h-24 bg-black/40 border border-neutral-800/60 rounded-[1.5rem] p-5 text-base focus:theme-border-active transition-all outline-none resize-none text-neutral-300 shadow-inner"></textarea>
+                        </div>
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center px-2">
+                                <label class="text-[10px] font-black uppercase tracking-[0.4em] text-neutral-500 italic">Traducción</label>
+                                <button id="copy-dec-btn" class="px-4 py-1.5 theme-glow-bg hover:bg-white/5 rounded-xl transition-all theme-accent text-[9px] font-bold uppercase tracking-widest theme-border active:scale-95 shadow-lg">Copiar</button>
+                            </div>
+                            <div id="output-decoded" class="w-full min-h-[80px] bg-white/[0.02] border border-neutral-800 rounded-[1.5rem] p-5 font-mono text-xl text-neutral-200 break-all leading-relaxed shadow-inner">
+                                <span id="output-placeholder-dec" class="text-neutral-800 italic text-xs font-sans">Traducción en tiempo real...</span>
+                                <span id="output-content-dec"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button id="reset-btn" class="w-full mt-6 py-5 flex items-center justify-center gap-3 bg-neutral-900 border border-neutral-800/40 text-neutral-500 rounded-[2.5rem] font-bold transition-all text-[11px] tracking-[0.4em] uppercase active:scale-95 hover:text-red-500">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
-                        Reiniciar Todo
+                        Reiniciar Sistema
                     </button>
                 </div>
             </div>
@@ -247,7 +271,7 @@
         
         let state = {
             shift: 3, lastShift: 3, rotation: 3 * (360 / total),
-            message: '', isDragging: false, startAngle: 0,
+            message: '', codeToDecode: '', isDragging: false, startAngle: 0,
             themeColor: '#fbbf24', themeRGB: '251, 191, 36', isMuted: false,
             zoom: 100
         };
@@ -263,12 +287,12 @@
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             osc.type = 'triangle';
-            osc.frequency.setValueAtTime(150, now);
-            osc.frequency.exponentialRampToValueAtTime(40, now + 0.08);
-            gain.gain.setValueAtTime(0.18, now);
-            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+            osc.frequency.setValueAtTime(160, now);
+            osc.frequency.exponentialRampToValueAtTime(40, now + 0.06);
+            gain.gain.setValueAtTime(0.12, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
             osc.connect(gain); gain.connect(audioCtx.destination);
-            osc.start(now); osc.stop(now + 0.08);
+            osc.start(now); osc.stop(now + 0.06);
         }
 
         const canvas = document.getElementById('mainDisk');
@@ -276,12 +300,16 @@
         const diskWrapper = document.getElementById('disk-wrapper');
         const diskGlow = document.getElementById('disk-glow');
         const inputEl = document.getElementById('input-text');
-        const outputEl = document.getElementById('output-content');
-        const outputPlaceholder = document.getElementById('output-placeholder');
+        const inputCodeEl = document.getElementById('input-code');
+        const outputEnc = document.getElementById('output-content-enc');
+        const outputDec = document.getElementById('output-content-dec');
+        const placeholderEnc = document.getElementById('output-placeholder-enc');
+        const placeholderDec = document.getElementById('output-placeholder-dec');
         const shiftDisplay = document.getElementById('shift-value');
         const resetBtn = document.getElementById('reset-btn');
         const diskResetBtn = document.getElementById('disk-reset-btn');
         const copyBtn = document.getElementById('copy-btn');
+        const copyDecBtn = document.getElementById('copy-dec-btn');
         const themeMenuBtn = document.getElementById('theme-menu-btn');
         const themeDropdown = document.getElementById('theme-dropdown');
         const closeDropdownBtn = document.getElementById('close-dropdown-btn');
@@ -310,25 +338,17 @@
             }
         });
 
-        // Controles de Zoom Corregidos
         function updateZoom(delta) {
             state.zoom = Math.max(50, Math.min(180, state.zoom + delta));
             zoomLabel.textContent = `${state.zoom}%`;
-            
-            // Calculamos el tamaño visual en base al viewport
             const isDesktop = window.innerWidth >= 1024;
             const baseSize = isDesktop ? 800 : Math.min(window.innerWidth * 0.9, 500);
-            
-            // Aplicamos ancho directo al wrapper
             const finalWidth = (baseSize * state.zoom) / 100;
             diskWrapper.style.width = `${finalWidth}px`;
-            
             playTick();
         }
 
-        // Inicializar tamaño correcto en carga
         window.addEventListener('load', () => updateZoom(0));
-
         zoomInBtn.addEventListener('click', (e) => { e.stopPropagation(); updateZoom(10); });
         zoomOutBtn.addEventListener('click', (e) => { e.stopPropagation(); updateZoom(-10); });
 
@@ -345,28 +365,8 @@
             }
         });
 
-        downloadBtn.addEventListener('click', (e) => { e.stopPropagation(); generatePrintablePDF(); });
-
-        function setTheme(color, rgb) {
-            state.themeColor = color;
-            state.themeRGB = rgb;
-            document.documentElement.style.setProperty('--theme-color', color);
-            document.documentElement.style.setProperty('--theme-color-rgb', rgb);
-            update();
-        }
-
-        paletteBtns.forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                paletteBtns.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                setTheme(btn.dataset.color, btn.dataset.rgb);
-            });
-        });
-
         function draw() {
-            const centerX = canvas.width / 2;
-            const centerY = canvas.height / 2;
+            const centerX = canvas.width / 2; const centerY = canvas.height / 2;
             const radius = Math.min(centerX, centerY) * 0.94;
             const angleStep = (Math.PI * 2) / total;
             const innerR = radius * 0.68;
@@ -374,11 +374,11 @@
             
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // 1. Disco Exterior
+            // Disco Exterior
             ctx.beginPath(); ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-            let gradOuter = ctx.createRadialGradient(centerX, centerY, radius * 0.8, centerX, centerY, radius);
-            gradOuter.addColorStop(0.85, '#0a0a0a'); gradOuter.addColorStop(1, '#1a1a1a');
-            ctx.fillStyle = gradOuter; ctx.fill(); ctx.strokeStyle = '#222'; ctx.lineWidth = 4; ctx.stroke();
+            let gradO = ctx.createRadialGradient(centerX, centerY, radius * 0.8, centerX, centerY, radius);
+            gradO.addColorStop(0.85, '#0a0a0a'); gradO.addColorStop(1, '#1a1a1a');
+            ctx.fillStyle = gradO; ctx.fill(); ctx.strokeStyle = '#222'; ctx.lineWidth = 4; ctx.stroke();
 
             // Separadores Exteriores
             ctx.save();
@@ -393,7 +393,7 @@
             }
             ctx.restore();
 
-            // Letras Blancas Exteriores
+            // Letras Blancas
             const outerTextRadius = radius * 0.88;
             ctx.font = `bold ${radius * 0.135}px Inter`;
             ctx.fillStyle = '#9aa'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
@@ -403,39 +403,26 @@
                 ctx.save(); ctx.translate(tx, ty); ctx.rotate(angle + Math.PI/2); ctx.fillText(letter, 0, 0); ctx.restore();
             });
 
-            // Puntero
+            // Puntero Vértice
             ctx.save(); ctx.translate(centerX, centerY - radius - 15);
             ctx.beginPath(); ctx.moveTo(0, 35); ctx.lineTo(-22, 0); ctx.lineTo(22, 0); ctx.closePath();
             ctx.fillStyle = state.themeColor; ctx.shadowColor = `rgba(${state.themeRGB}, 0.8)`; ctx.shadowBlur = 20; ctx.fill();
             ctx.restore();
 
-            // 2. Disco Interno (Ámbar)
-            ctx.save(); ctx.translate(centerX, centerY); ctx.rotate(state.rotation * Math.PI / 180); ctx.translate(-centerX, -centerY);
+            // 2. DISCO ÁMBAR (GIRATORIO)
+            ctx.save();
+            ctx.translate(centerX, centerY); ctx.rotate(state.rotation * Math.PI / 180); ctx.translate(-centerX, -centerY);
 
             ctx.beginPath(); ctx.arc(centerX, centerY, innerR, 0, Math.PI * 2);
             let gradInner = ctx.createRadialGradient(centerX, centerY, innerR * 0.6, centerX, centerY, innerR);
             gradInner.addColorStop(0.6, '#222'); gradInner.addColorStop(1, '#111');
             ctx.fillStyle = gradInner; ctx.fill(); ctx.strokeStyle = state.themeColor; ctx.lineWidth = 6; ctx.stroke();
 
-            // Separadores Interiores
-            ctx.save();
-            let innerLinesGrad = ctx.createRadialGradient(centerX, centerY, knobRadius, centerX, centerY, innerR);
-            innerLinesGrad.addColorStop(0, 'rgba(0,0,0,0)'); innerLinesGrad.addColorStop(1, `rgba(${state.themeRGB}, 0.9)`);
-            ctx.strokeStyle = innerLinesGrad; ctx.lineWidth = 1.8;
-            for(let i = 0; i < total; i++) {
-                const angle = (i + 0.5) * angleStep - Math.PI / 2;
-                ctx.beginPath(); ctx.moveTo(centerX + Math.cos(angle) * knobRadius, centerY + Math.sin(angle) * knobRadius);
-                ctx.lineTo(centerX + Math.cos(angle) * innerR, centerY + Math.sin(angle) * innerR);
-                ctx.stroke();
-            }
-            ctx.restore();
-
-            // Flechas
-            ctx.save(); ctx.strokeStyle = 'rgba(160, 160, 160, 0.15)'; ctx.lineWidth = 12.0; ctx.lineCap = 'round';
-            const arrowRadius = knobRadius + 55; const arrowSpan = 0.85; 
+            // Flechas de Giro
+            ctx.save(); ctx.strokeStyle = 'rgba(160, 160, 160, 0.2)'; ctx.lineWidth = 14.0; ctx.lineCap = 'round';
             const drawIndicator = (centerAngle) => {
-                const start = centerAngle - arrowSpan/2; const end = centerAngle + arrowSpan/2;
-                ctx.beginPath(); ctx.arc(centerX, centerY, arrowRadius, start, end); ctx.stroke();
+                const start = centerAngle - 0.42; const end = centerAngle + 0.42;
+                ctx.beginPath(); ctx.arc(centerX, centerY, knobRadius + 55, start, end); ctx.stroke();
             };
             drawIndicator(0); drawIndicator(Math.PI); ctx.restore();
 
@@ -457,85 +444,66 @@
                 ctx.save(); ctx.translate(tx, ty); ctx.rotate(angle + Math.PI/2); ctx.fillText(letter, 0, 0); ctx.restore();
             });
 
-            // Perilla Central
-            ctx.beginPath(); ctx.arc(centerX, centerY, knobRadius + 12, 0, Math.PI * 2);
-            let housingGrad = ctx.createRadialGradient(centerX, centerY, knobRadius, centerX, centerY, knobRadius + 12);
-            housingGrad.addColorStop(0, '#000'); housingGrad.addColorStop(1, '#222');
-            ctx.fillStyle = housingGrad; ctx.fill();
-
+            // Perilla Central (Mecánica)
             ctx.beginPath(); ctx.arc(centerX, centerY, knobRadius, 0, Math.PI * 2);
-            let knobSurfaceGrad = ctx.createRadialGradient(centerX - knobRadius*0.2, centerY - knobRadius*0.2, 0, centerX, centerY, knobRadius);
-            knobSurfaceGrad.addColorStop(0, '#2a2a2a'); knobSurfaceGrad.addColorStop(0.7, '#151515'); knobSurfaceGrad.addColorStop(1, '#0a0a0a');
+            let knobSurfaceGrad = ctx.createRadialGradient(centerX - 40, centerY - 40, 0, centerX, centerY, knobRadius);
+            knobSurfaceGrad.addColorStop(0, '#2a2a2a'); knobSurfaceGrad.addColorStop(1, '#0a0a0a');
             ctx.fillStyle = knobSurfaceGrad; ctx.fill();
-
-            // LED
+            
+            // LED de estado
             const lx = centerX + Math.cos(-Math.PI/2) * (knobRadius * 0.78); const ly = centerY + Math.sin(-Math.PI/2) * (knobRadius * 0.78);
             ctx.beginPath(); ctx.arc(lx, ly, 10, 0, Math.PI * 2);
             let ledLight = ctx.createRadialGradient(lx - 2, ly - 2, 0, lx, ly, 10);
-            ledLight.addColorStop(0, '#fff'); ledLight.addColorStop(0.3, '#888'); ledLight.addColorStop(1, '#000');
+            ledLight.addColorStop(0, '#fff'); ledLight.addColorStop(1, '#000');
             ctx.fillStyle = ledLight; ctx.fill();
 
             ctx.restore(); 
 
-            // Referencia central
+            // Referencia Fija
             ctx.save(); ctx.translate(centerX, centerY - (innerR * 0.65)); 
             ctx.beginPath(); ctx.moveTo(0, -32); ctx.lineTo(-22, 5); ctx.lineTo(22, 5); ctx.closePath();
             ctx.fillStyle = '#9aa'; ctx.shadowColor = 'rgba(153, 170, 170, 0.6)'; ctx.shadowBlur = 12; ctx.fill(); ctx.restore();
         }
 
         function generatePrintablePDF() {
-            const tempCanvas = document.createElement('canvas');
-            tempCanvas.width = 2480; tempCanvas.height = 3508;
+            const tempCanvas = document.createElement('canvas'); tempCanvas.width = 2480; tempCanvas.height = 3508;
             const pCtx = tempCanvas.getContext('2d');
             pCtx.fillStyle = '#FFFFFF'; pCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
             pCtx.strokeStyle = '#000000'; pCtx.lineWidth = 4; pCtx.strokeRect(80, 80, 2320, 3348);
             pCtx.fillStyle = '#000000'; pCtx.font = 'bold 50px Inter'; pCtx.textAlign = 'center';
             pCtx.fillText('PLANTILLA RECORTABLE: CIFRADOR CÉSAR', tempCanvas.width / 2, 160);
-
-            const angleStep = (Math.PI * 2) / total;
-            const drawCentralHub = (cx, cy) => {
-                const hubR = 50;
-                pCtx.save(); pCtx.beginPath(); pCtx.arc(cx, cy, hubR, 0, Math.PI * 2); pCtx.lineWidth = 3; pCtx.stroke();
+            const aS = (Math.PI * 2) / total;
+            const drawH = (cx, cy) => {
+                pCtx.save(); pCtx.beginPath(); pCtx.arc(cx, cy, 50, 0, Math.PI * 2); pCtx.lineWidth = 3; pCtx.stroke();
                 pCtx.lineWidth = 1; pCtx.beginPath(); pCtx.moveTo(cx - 70, cy); pCtx.lineTo(cx + 70, cy);
                 pCtx.moveTo(cx, cy - 70); pCtx.lineTo(cx, cy + 70); pCtx.stroke();
-                pCtx.restore();
+                pCtx.beginPath(); pCtx.arc(cx, cy, 8, 0, Math.PI * 2); pCtx.fill(); pCtx.restore();
             };
-
             const oCX = tempCanvas.width / 2, oCY = 1000, oR = 760; 
             pCtx.beginPath(); pCtx.arc(oCX, oCY, oR, 0, Math.PI * 2); pCtx.lineWidth = 6; pCtx.stroke();
             for(let i = 0; i < total; i++) {
-                const a = (i + 0.5) * angleStep - Math.PI / 2;
-                pCtx.beginPath(); pCtx.moveTo(oCX + Math.cos(a) * 580, oCY + Math.sin(a) * 580);
-                pCtx.lineTo(oCX + Math.cos(a) * oR, oCY + Math.sin(a) * oR);
-                pCtx.lineWidth = 2; pCtx.stroke();
+                const a = (i + 0.5) * aS - Math.PI / 2;
+                pCtx.beginPath(); pCtx.moveTo(oCX + Math.cos(a) * 580, oCY + Math.sin(a) * 580); pCtx.lineTo(oCX + Math.cos(a) * oR, oCY + Math.sin(a) * oR); pCtx.lineWidth = 2; pCtx.stroke();
             }
             pCtx.font = 'bold 70px Inter';
-            ALPHABET.forEach((letter, i) => {
-                const a = i * angleStep - Math.PI / 2;
-                const tx = oCX + Math.cos(a) * (oR - 130); const ty = oCY + Math.sin(a) * (oR - 130);
-                pCtx.save(); pCtx.translate(tx, ty); pCtx.rotate(a + Math.PI/2); pCtx.fillText(letter, 0, 0); pCtx.restore();
+            ALPHABET.forEach((l, i) => {
+                const a = i * aS - Math.PI / 2;
+                pCtx.save(); pCtx.translate(oCX + Math.cos(a)*(oR-130), oCY + Math.sin(a)*(oR-130)); pCtx.rotate(a + Math.PI/2); pCtx.fillText(l, 0, 0); pCtx.restore();
             });
-            drawCentralHub(oCX, oCY);
-
+            drawH(oCX, oCY);
             const iCX = tempCanvas.width / 2, iCY = 2550, iR = 560; 
             pCtx.beginPath(); pCtx.arc(iCX, iCY, iR, 0, Math.PI * 2); pCtx.lineWidth = 6; pCtx.stroke();
             for(let i = 0; i < total; i++) {
-                const a = (i + 0.5) * angleStep - Math.PI / 2;
-                pCtx.beginPath(); pCtx.moveTo(iCX + Math.cos(a) * 150, iCY + Math.sin(a) * 150);
-                pCtx.lineTo(iCX + Math.cos(a) * iR, iCY + Math.sin(a) * iR);
-                pCtx.lineWidth = 2; pCtx.stroke();
+                const a = (i + 0.5) * aS - Math.PI / 2;
+                pCtx.beginPath(); pCtx.moveTo(iCX + Math.cos(a) * 150, iCY + Math.sin(a) * 150); pCtx.lineTo(iCX + Math.cos(a) * iR, iCY + Math.sin(a) * iR); pCtx.lineWidth = 2; pCtx.stroke();
             }
-            ALPHABET.forEach((letter, i) => {
-                const a = i * angleStep - Math.PI / 2;
-                const tx = iCX + Math.cos(a) * (iR - 100); const ty = iCY + Math.sin(a) * (iR - 100);
-                pCtx.save(); pCtx.translate(tx, ty); pCtx.rotate(a + Math.PI/2);
-                pCtx.font = 'bold 60px Inter'; pCtx.fillText(letter, 0, 0);
-                pCtx.font = '28px "JetBrains Mono"'; pCtx.fillText(i, 0, 80); pCtx.restore();
+            ALPHABET.forEach((l, i) => {
+                const a = i * aS - Math.PI / 2;
+                pCtx.save(); pCtx.translate(iCX + Math.cos(a)*(iR-100), iCY + Math.sin(a)*(iR-100)); pCtx.rotate(a + Math.PI/2);
+                pCtx.font = 'bold 60px Inter'; pCtx.fillText(l, 0, 0); pCtx.font = '28px "JetBrains Mono"'; pCtx.fillText(i, 0, 80); pCtx.restore();
             });
-            drawCentralHub(iCX, iCY);
-
-            const { jsPDF } = window.jspdf;
-            const pdf = new jsPDF('p', 'mm', 'a4');
+            drawH(iCX, iCY);
+            const { jsPDF } = window.jspdf; const pdf = new jsPDF('p', 'mm', 'a4');
             pdf.addImage(tempCanvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, 210, 297);
             pdf.save('Caesar_Cipher_Blueprint.pdf');
         }
@@ -545,73 +513,74 @@
             return Math.atan2(clientY - (rect.top + rect.height/2), clientX - (rect.left + rect.width/2)) * (180/Math.PI);
         }
 
-        function update() {
-            const res = state.message.toUpperCase().split("").map(c => {
-                const i = ALPHABET.indexOf(c); return i === -1 ? c : ALPHABET[(i + state.shift) % total];
+        function encrypt(text, s) {
+            return text.toUpperCase().split("").map(c => {
+                const i = ALPHABET.indexOf(c); if (i === -1) return c;
+                let ni = (i + s) % total; if (ni < 0) ni += total;
+                return ALPHABET[ni];
             }).join("");
-            outputEl.textContent = res;
-            if (res) outputPlaceholder.classList.add('hidden');
-            else outputPlaceholder.classList.remove('hidden');
+        }
+
+        function update() {
+            // Lógica Cifrador (Directo)
+            const rE = encrypt(state.message, state.shift);
+            outputEnc.textContent = rE;
+            if (rE) placeholderEnc.classList.add('hidden'); else placeholderEnc.classList.remove('hidden');
             
+            // Lógica Descifrador (Inverso)
+            const rD = encrypt(state.codeToDecode, -state.shift);
+            outputDec.textContent = rD;
+            if (rD) placeholderDec.classList.add('hidden'); else placeholderDec.classList.remove('hidden');
+
             shiftDisplay.textContent = state.shift.toString().padStart(2, '0');
             if (state.shift !== state.lastShift) { playTick(); state.lastShift = state.shift; }
-            if (state.isDragging) diskGlow.style.boxShadow = `0 0 50px 15px rgba(${state.themeRGB}, 0.2)`;
-            else diskGlow.style.boxShadow = 'none';
+            if (state.isDragging) diskGlow.style.boxShadow = `0 0 50px 15px rgba(${state.themeRGB}, 0.2)`; else diskGlow.style.boxShadow = 'none';
             draw();
         }
 
         const handleStart = (e) => {
             const rect = canvas.getBoundingClientRect();
-            const cX = e.touches ? e.touches[0].clientX : e.clientX; 
-            const cY = e.touches ? e.touches[0].clientY : e.clientY;
+            const cX = e.touches ? e.touches[0].clientX : e.clientX; const cY = e.touches ? e.touches[0].clientY : e.clientY;
             const dx = cX - (rect.left + rect.width / 2); const dy = cY - (rect.top + rect.height / 2);
             const dist = Math.sqrt(dx * dx + dy * dy);
-            
-            // Límite del disco interior (ámbar) calculado sobre el rect visual actual
-            const innerDiskLimit = (rect.width / 2) * 0.94 * 0.68;
-
-            if (dist <= innerDiskLimit) {
+            const innerLimit = (rect.width / 2) * 0.94 * 0.68;
+            if (dist <= innerLimit) {
                 if (e.cancelable) e.preventDefault();
-                state.isDragging = true; state.startAngle = getAngle(cX, cY) - state.rotation; 
-                canvas.style.cursor = 'grabbing'; update();
+                state.isDragging = true; state.startAngle = getAngle(cX, cY) - state.rotation; canvas.style.cursor = 'grabbing';
             } else { state.isDragging = false; }
         };
 
         const handleMove = (e) => {
             if (!state.isDragging) return;
             if (e.cancelable) e.preventDefault();
-            const cX = e.touches ? e.touches[0].clientX : e.clientX; 
-            const cY = e.touches ? e.touches[0].clientY : e.clientY;
+            const cX = e.touches ? e.touches[0].clientX : e.clientX; const cY = e.touches ? e.touches[0].clientY : e.clientY;
             state.rotation = getAngle(cX, cY) - state.startAngle;
-            let normRot = ((-state.rotation % 360) + 360) % 360;
-            state.shift = Math.round(normRot / (360 / total)) % total; update();
+            let nRot = ((-state.rotation % 360) + 360) % 360;
+            state.shift = Math.round(nRot / (360 / total)) % total; update();
         };
 
-        const handleEnd = () => {
-            if (!state.isDragging) return; 
-            state.isDragging = false; canvas.style.cursor = 'grab';
-            state.rotation = -(state.shift * (360 / total)); update();
-        };
+        const handleEnd = () => { if (!state.isDragging) return; state.isDragging = false; canvas.style.cursor = 'grab'; state.rotation = -(state.shift * (360 / total)); update(); };
 
         canvas.addEventListener('mousedown', handleStart); window.addEventListener('mousemove', handleMove); window.addEventListener('mouseup', handleEnd);
         canvas.addEventListener('touchstart', handleStart, {passive: false}); window.addEventListener('touchmove', handleMove, {passive: false}); window.addEventListener('touchend', handleEnd);
         inputEl.addEventListener('input', (e) => { state.message = e.target.value; update(); });
+        inputCodeEl.addEventListener('input', (e) => { state.codeToDecode = e.target.value; update(); });
         diskResetBtn.addEventListener('click', () => { state.shift = 0; state.rotation = 0; update(); playTick(); });
-        resetBtn.addEventListener('click', () => { state.message = ''; state.shift = 0; state.rotation = 0; inputEl.value = ''; update(); });
+        resetBtn.addEventListener('click', () => { state.message = ''; state.codeToDecode = ''; state.shift = 0; state.rotation = 0; inputEl.value = ''; inputCodeEl.value = ''; update(); });
         copyBtn.addEventListener('click', () => {
-            const t = outputEl.innerText; if (t) {
-                const el = document.createElement("textarea"); el.value = t; document.body.appendChild(el);
-                el.select(); document.execCommand("copy"); document.body.removeChild(el);
+            const t = outputEnc.innerText; if (t) {
+                const el = document.createElement("textarea"); el.value = t; document.body.appendChild(el); el.select(); document.execCommand("copy"); document.body.removeChild(el);
                 copyBtn.innerText = "¡OK!"; setTimeout(() => copyBtn.innerText = "Copiar", 1000);
             }
         });
-        window.addEventListener('resize', () => {
-            updateZoom(0);
-            draw();
+        copyDecBtn.addEventListener('click', () => {
+            const t = outputDec.innerText; if (t) {
+                const el = document.createElement("textarea"); el.value = t; document.body.appendChild(el); el.select(); document.execCommand("copy"); document.body.removeChild(el);
+                copyDecBtn.innerText = "¡OK!"; setTimeout(() => copyDecBtn.innerText = "Copiar", 1000);
+            }
         });
-        
-        draw(); 
-        update();
+        window.addEventListener('resize', () => { updateZoom(0); draw(); });
+        draw(); update();
     </script>
 </body>
 </html>
